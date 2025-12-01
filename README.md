@@ -11,9 +11,7 @@ Aplicación móvil multiplataforma (Flutter) que permite a pequeños comercios:
 - Visualizar un panel con balance (ganancias - gastos).
 
 ## Integrantes
-- Nombre Apellido — Rol (ej. Frontend / Flutter)
-- Nombre Apellido — Rol (ej. Diseño / QA)
-(Actualizar con los integrantes reales)
+- Rubén Carribero Garcia - FullStack
 
 ## Fases del proyecto
 1. Análisis y requisitos
