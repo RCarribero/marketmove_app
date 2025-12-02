@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/providers/ventas_provider.dart';
 import '../../../shared/providers/gastos_provider.dart';
+import '../../../shared/widgets/summary_card.dart';
 
 class ResumenPage extends StatefulWidget {
   const ResumenPage({super.key});
@@ -54,21 +55,21 @@ class _ResumenPageState extends State<ResumenPage> {
 
                 return Column(
                   children: [
-                    _SummaryCard(
+                    SummaryCard(
                       title: 'Total Ventas',
                       amount: totalVentas,
                       icon: Icons.trending_up,
                       color: Colors.green,
                     ),
                     const SizedBox(height: 16),
-                    _SummaryCard(
+                    SummaryCard(
                       title: 'Total Gastos',
                       amount: totalGastos,
                       icon: Icons.trending_down,
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    _SummaryCard(
+                    SummaryCard(
                       title: 'Balance',
                       amount: balance,
                       icon: Icons.account_balance_wallet,
@@ -79,41 +80,6 @@ class _ResumenPageState extends State<ResumenPage> {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryCard extends StatelessWidget {
-  final String title;
-  final double amount;
-  final IconData icon;
-  final Color color;
-
-  const _SummaryCard({
-    required this.title,
-    required this.amount,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(icon, color: color),
-        ),
-        title: Text(title),
-        trailing: Text(
-          '\$${amount.toStringAsFixed(2)}',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
         ),
       ),
     );

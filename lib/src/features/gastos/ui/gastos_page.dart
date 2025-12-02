@@ -4,7 +4,8 @@ import '../../../shared/providers/gastos_provider.dart';
 import '../../../shared/models/expense_model.dart';
 
 class GastosPage extends StatefulWidget {
-  const GastosPage({super.key});
+  final String? userId;
+  const GastosPage({super.key, this.userId});
 
   @override
   State<GastosPage> createState() => _GastosPageState();
@@ -14,7 +15,9 @@ class _GastosPageState extends State<GastosPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<GastosProvider>().loadExpenses());
+    Future.microtask(
+      () => context.read<GastosProvider>().loadExpenses(userId: widget.userId),
+    );
   }
 
   void _showExpenseDialog([Expense? expense]) {

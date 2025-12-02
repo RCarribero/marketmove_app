@@ -14,6 +14,15 @@ class ExpenseService {
     return (response as List).map((e) => Expense.fromJson(e)).toList();
   }
 
+  Future<List<Expense>> getAllForUser(String userId) async {
+    final response = await _client
+        .from('gastos')
+        .select()
+        .eq('user_id', userId)
+        .order('date', ascending: false);
+    return (response as List).map((e) => Expense.fromJson(e)).toList();
+  }
+
   Future<Expense> getById(int id) async {
     final response = await _client
         .from('gastos')

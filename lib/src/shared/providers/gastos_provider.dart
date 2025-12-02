@@ -15,13 +15,22 @@ class GastosProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> loadExpenses() async {
+  Future<void> loadExpenses({String? userId}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _expenses = await _service.getAll();
+      // Si se pasa userId, filtramos por ese ID (Solo funcionará si es Admin por RLS)
+      // Si no, carga los propios (comportamiento default)
+      if (userId != null) {
+        final response = await _service.getAllForUser(
+          userId,
+        ); // Necesitamos agregar este método al servicio
+        _expenses = response;
+      } else {
+        _expenses = await _service.getAll();
+      }
     } catch (e) {
       _error = e.toString();
     } finally {

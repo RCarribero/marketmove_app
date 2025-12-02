@@ -1,68 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../shared/providers/auth_provider.dart';
+import '../../../shared/theme/colors.dart';
+import 'dashboard_view.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final isAdmin = authProvider.isAdmin;
+    final userEmail = authProvider.user?.email ?? 'Usuario';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('MarketMove Home')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      appBar: AppBar(title: const Text('MarketMove')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            _MenuButton(
-              icon: Icons.point_of_sale,
-              label: 'Ventas',
-              onTap: () => context.push('/ventas'),
+            UserAccountsDrawerHeader(
+              accountName: const Text('MarketMove'),
+              accountEmail: Text(userEmail),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, size: 40, color: AppColors.primary),
+              ),
+              decoration: const BoxDecoration(color: AppColors.primary),
             ),
-            const SizedBox(height: 16),
-            _MenuButton(
-              icon: Icons.attach_money,
-              label: 'Gastos',
-              onTap: () => context.push('/gastos'),
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text('Dashboard'),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+              },
             ),
-            const SizedBox(height: 16),
-            _MenuButton(
-              icon: Icons.inventory,
-              label: 'Productos',
-              onTap: () => context.push('/productos'),
+            ListTile(
+              leading: const Icon(Icons.point_of_sale),
+              title: const Text('Ventas'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/ventas');
+              },
             ),
-            const SizedBox(height: 16),
-            _MenuButton(
-              icon: Icons.bar_chart,
-              label: 'Resumen',
-              onTap: () => context.push('/resumen'),
+            ListTile(
+              leading: const Icon(Icons.attach_money),
+              title: const Text('Gastos'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/gastos');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.inventory),
+              title: const Text('Productos'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/productos');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Resumen'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/resumen');
+              },
+            ),
+            if (isAdmin) ...[
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings),
+                title: const Text('Administrar Usuarios'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/admin');
+                },
+              ),
+            ],
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Cerrar Sesión',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                context.read<AuthProvider>().signOut();
+                context.go('/login');
+              },
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _MenuButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _MenuButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 200,
-      height: 60,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 32),
-        label: Text(label, style: const TextStyle(fontSize: 18)),
-      ),
+      body: const DashboardView(),
     );
   }
 }

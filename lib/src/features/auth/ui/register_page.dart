@@ -4,100 +4,51 @@ import 'package:provider/provider.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/theme/colors.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    // Pre-fill email if coming from registration
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final uri = GoRouterState.of(context).uri;
-      final email = uri.queryParameters['email'];
-      if (email != null && email.isNotEmpty) {
-        _emailController.text = email;
-      }
-    });
-  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   String _parseError(dynamic error) {
     final errorString = error.toString();
 
-    // Supabase errors
-    if (errorString.contains('Invalid login credentials')) {
-      return 'Correo o contraseña incorrectos';
-    }
-    if (errorString.contains('Email not confirmed')) {
-      return 'Por favor confirma tu correo electrónico';
-    }
     if (errorString.contains('User already registered')) {
       return 'Este correo ya está registrado';
     }
-    if (errorString.contains('anonymous_provider_disabled')) {
-      return 'Error de Supabase: Verifica la configuración de Email Auth';
-    }
-    if (errorString.contains('statusCode: 422')) {
-      return 'Datos inválidos. Verifica tu correo y contraseña';
-    }
-    if (errorString.contains('Network')) {
-      return 'Error de conexión. Verifica tu internet';
-    }
-
-    // Generic validation
-    if (errorString.contains('email')) {
+    if (errorString.contains('Invalid email')) {
       return 'Correo electrónico inválido';
     }
-    if (errorString.contains('password')) {
-      return 'La contraseña debe tener al menos 6 caracteres';
+    if (errorString.contains('Weak password')) {
+      return 'La contraseña es muy débil';
     }
 
-    // Default
-    return 'Error inesperado. Intenta nuevamente';
+    return 'Error al crear cuenta. Intenta nuevamente';
   }
 
-  Future<void> _login() async {
-    try {
-      await context.read<AuthProvider>().signIn(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
-
-      if (mounted) {
-        context.go('/home');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = _parseError(e);
-        });
-      }
-    }
-  }
-
-  Future<void> _signUp() async {
-    // Clear previous errors
+  Future<void> _register() async {
     setState(() => _error = null);
 
-    // Validate inputs
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
 
+    // Validaciones
     if (email.isEmpty) {
       setState(() => _error = 'Por favor ingresa tu correo electrónico');
       return;
@@ -118,24 +69,49 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    if (password != confirmPassword) {
+      setState(() => _error = 'Las contraseñas no coinciden');
+      return;
+    }
+
     try {
-      // DEBUG: Ver qué se está enviando
       print(
-        '🔍 DEBUG SignUp - Email: "$email", Password length: ${password.length}',
+        '🔍 DEBUG Register - Email: "$email", Password length: ${password.length}',
       );
 
       await context.read<AuthProvider>().signUp(email, password);
 
       if (mounted) {
+        // Show custom toast notification
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cuenta creada. Por favor inicia sesión.'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Row(
+              children: const [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Text(
+                  '✓ Cuenta creada exitosamente',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF4CAF50).withOpacity(0.85),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
           ),
         );
-        // Clear fields after successful signup
-        _emailController.clear();
-        _passwordController.clear();
+
+        // Wait a bit before navigating
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        // Navigate to login with email
+        if (mounted) {
+          context.go('/login?email=$email');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -170,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo with animated container
+                  // Logo
                   Hero(
                     tag: 'app_logo',
                     child: Container(
@@ -197,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Title
                   const Text(
-                    'MarketMove',
+                    'Crear Cuenta',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -207,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Gestiona tu negocio inteligente',
+                    'Únete a MarketMove',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white.withOpacity(0.9),
@@ -216,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Login Card
+                  // Register Card
                   Container(
                     constraints: const BoxConstraints(maxWidth: 400),
                     child: Card(
@@ -247,7 +223,19 @@ class _LoginPageState extends State<LoginPage> {
                               controller: _passwordController,
                               decoration: const InputDecoration(
                                 labelText: 'Contraseña',
-                                hintText: '••••••••',
+                                hintText: 'Mínimo 6 caracteres',
+                                prefixIcon: Icon(Icons.lock_outline),
+                              ),
+                              obscureText: true,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Confirm Password Field
+                            TextField(
+                              controller: _confirmPasswordController,
+                              decoration: const InputDecoration(
+                                labelText: 'Confirmar Contraseña',
+                                hintText: 'Repite tu contraseña',
                                 prefixIcon: Icon(Icons.lock_outline),
                               ),
                               obscureText: true,
@@ -289,35 +277,13 @@ class _LoginPageState extends State<LoginPage> {
 
                             const SizedBox(height: 32),
 
-                            // Login Button
+                            // Register Button
                             if (isLoading)
                               const Center(child: CircularProgressIndicator())
                             else ...[
                               ElevatedButton(
-                                onPressed: _login,
+                                onPressed: _register,
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'INICIAR SESIÓN',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Sign Up Button
-                              OutlinedButton(
-                                onPressed: () => context.go('/register'),
-                                style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
                                   ),
@@ -334,88 +300,20 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 16),
 
-                              const SizedBox(height: 24),
-
-                              // Divider
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      color: Colors.grey.shade300,
-                                      thickness: 1,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      'O continúa con',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Divider(
-                                      color: Colors.grey.shade300,
-                                      thickness: 1,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 24),
-
-                              // Google Sign In
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  context
-                                      .read<AuthProvider>()
-                                      .signInWithGoogle();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black87,
-                                  side: BorderSide(color: Colors.grey.shade300),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: Image.network(
-                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png',
-                                  height: 20,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.g_mobiledata, size: 20),
-                                ),
-                                label: const Text(
-                                  'Continuar con Google',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              // Back to Login Button
+                              TextButton(
+                                onPressed: () => context.go('/'),
+                                child: const Text(
+                                  '¿Ya tienes cuenta? Inicia sesión',
+                                  style: TextStyle(fontSize: 14),
                                 ),
                               ),
                             ],
                           ],
                         ),
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Footer
-                  Text(
-                    '© 2024 MarketMove. Todos los derechos reservados.',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 12,
                     ),
                   ),
                 ],
