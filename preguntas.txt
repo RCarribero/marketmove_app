@@ -1,0 +1,37 @@
+¿Habrá un solo tipo de usuario o varios roles?
+
+¿El usuario puede tener varias tiendas o solo una?
+
+¿Qué tipo de registro deseas?
+
+¿El usuario podrá crear productos manualmente?
+
+¿Los productos tendrán imagen o solo texto?
+
+¿Qué campos necesitas para cada producto?
+
+¿Una venta contiene un solo producto o varios productos?
+
+¿Quieres registrar método de pago?
+
+¿Se podrán editar las ventas?
+
+¿Los gastos tendrán categorías?
+
+¿Quieres adjuntar foto del ticket/factura?
+
+¿Se podrán editar los gastos?
+
+¿Qué métricas quieres incluir en el panel?
+
+¿Quieres estadísticas por día, semana o mes?
+
+¿UI sencilla o más elaborada?
+
+¿Diseño claro u oscuro?
+
+¿Modo oscuro automático?
+
+¿La app debe funcionar offline?
+
+¿Planeas añadir funciones futuras importantes?

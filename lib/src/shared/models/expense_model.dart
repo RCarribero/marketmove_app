@@ -1,11 +1,26 @@
+/// Modelo que representa un gasto registrado.
+///
+/// Corresponde a la tabla 'gastos' en Supabase.
 class Expense {
+  /// Identificador único del gasto.
   final int id;
+
+  /// ID del usuario propietario del gasto (Supabase Auth).
   final String? userId;
+
+  /// Monto del gasto.
   final double amount;
+
+  /// Descripción detallada del gasto.
   final String description;
+
+  /// Categoría del gasto (ej. Alquiler, Servicios, etc.).
   final String category;
+
+  /// Fecha en que se realizó el gasto.
   final DateTime date;
 
+  /// Constructor inmutable para crear una instancia de [Expense].
   const Expense({
     required this.id,
     this.userId,
@@ -15,6 +30,7 @@ class Expense {
     required this.date,
   });
 
+  /// Crea una copia de esta instancia con los campos modificados.
   Expense copyWith({
     int? id,
     String? userId,
@@ -33,6 +49,7 @@ class Expense {
     );
   }
 
+  /// Convierte la instancia a un mapa JSON compatible con Supabase.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -44,6 +61,7 @@ class Expense {
     };
   }
 
+  /// Crea una instancia de [Expense] a partir de un mapa JSON.
   factory Expense.fromJson(Map<String, dynamic> json) {
     return Expense(
       id: json['id'] as int,

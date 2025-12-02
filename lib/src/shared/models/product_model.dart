@@ -1,13 +1,32 @@
+/// Modelo que representa un producto en el inventario.
+///
+/// Corresponde a la tabla 'productos' en Supabase.
 class Product {
+  /// Identificador único del producto.
   final int id;
+
+  /// ID del usuario propietario del producto (Supabase Auth).
   final String? userId;
+
+  /// Nombre del producto.
   final String name;
+
+  /// Precio unitario del producto.
   final double price;
+
+  /// Cantidad disponible en stock.
   final int stock;
+
+  /// Descripción opcional del producto.
   final String? description;
+
+  /// URL de la imagen del producto (opcional).
   final String? imageUrl;
+
+  /// Fecha de creación del registro.
   final DateTime createdAt;
 
+  /// Constructor inmutable para crear una instancia de [Product].
   const Product({
     required this.id,
     this.userId,
@@ -19,6 +38,7 @@ class Product {
     required this.createdAt,
   });
 
+  /// Crea una copia de esta instancia con los campos modificados.
   Product copyWith({
     int? id,
     String? userId,
@@ -41,6 +61,7 @@ class Product {
     );
   }
 
+  /// Convierte la instancia a un mapa JSON compatible con Supabase.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -54,6 +75,7 @@ class Product {
     };
   }
 
+  /// Crea una instancia de [Product] a partir de un mapa JSON.
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as int,
