@@ -7,6 +7,8 @@ import 'features/gastos/ui/gastos_page.dart';
 import 'features/productos/ui/productos_page.dart';
 import 'features/resumen/ui/resumen_page.dart';
 import 'features/reports/ui/reports_page.dart';
+import 'features/reports/ui/advanced_reports_page.dart';
+import 'features/pricing/ui/pricing_page.dart';
 import 'features/profile/ui/profile_page.dart';
 import 'features/home/ui/home_page.dart';
 import 'features/home/ui/user_dashboard_page.dart';
@@ -107,6 +109,16 @@ final router = GoRouter(
       path: '/reportes',
       pageBuilder: (context, state) =>
           _buildPageWithTransition(state, const ReportsPage()),
+    ),
+    GoRoute(
+      path: '/reportes-avanzados',
+      pageBuilder: (context, state) =>
+          _buildPageWithTransition(state, const AdvancedReportsPage()),
+    ),
+    GoRoute(
+      path: '/pricing',
+      pageBuilder: (context, state) =>
+          _buildPageWithTransition(state, const PricingPage()),
     ),
     GoRoute(
       path: '/perfil',

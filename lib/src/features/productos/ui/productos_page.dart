@@ -288,7 +288,7 @@ class _ProductosPageState extends State<ProductosPage>
         slivers: [
           // Modern SliverAppBar
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 120,
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -495,16 +495,10 @@ class _ProductosPageState extends State<ProductosPage>
 
               return SliverPadding(
                 padding: const EdgeInsets.all(16),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.85,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
+                sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final product = products[index];
-                    return _ProductCard(
+                    return _ProductListTile(
                       product: product,
                       currencyFormat: currencyFormat,
                       isDark: isDark,
@@ -551,6 +545,214 @@ class _ProductosPageState extends State<ProductosPage>
     if (confirm == true && mounted && product.id != null) {
       await context.read<ProductsProvider>().deleteProduct(product.id!);
     }
+  }
+}
+
+class _ProductListTile extends StatelessWidget {
+  final Product product;
+  final NumberFormat currencyFormat;
+  final bool isDark;
+  final int index;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _ProductListTile({
+    required this.product,
+    required this.currencyFormat,
+    required this.isDark,
+    required this.index,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isLowStock = product.stock <= 5;
+    final isOutOfStock = product.stock <= 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCardBackground : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkSurfaceVariant : Colors.grey.shade200,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onEdit,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Icono con gradiente
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.secondary, AppColors.secondaryLight],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.inventory_2,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              // Info del producto
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    if (product.description != null &&
+                        product.description!.isNotEmpty)
+                      Text(
+                        product.description!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isOutOfStock
+                                ? AppColors.error.withAlpha(25)
+                                : isLowStock
+                                ? AppColors.warning.withAlpha(25)
+                                : AppColors.success.withAlpha(25),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isOutOfStock
+                                    ? Icons.error
+                                    : isLowStock
+                                    ? Icons.warning_amber
+                                    : Icons.check_circle,
+                                size: 12,
+                                color: isOutOfStock
+                                    ? AppColors.error
+                                    : isLowStock
+                                    ? AppColors.warning
+                                    : AppColors.success,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                isOutOfStock
+                                    ? 'Sin stock'
+                                    : 'Stock: ${product.stock}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isOutOfStock
+                                      ? AppColors.error
+                                      : isLowStock
+                                      ? AppColors.warning
+                                      : AppColors.success,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Precio y acciones
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    currencyFormat.format(product.price),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ActionButton(
+                        icon: Icons.edit,
+                        color: AppColors.primary,
+                        onTap: onEdit,
+                      ),
+                      const SizedBox(width: 8),
+                      _ActionButton(
+                        icon: Icons.delete,
+                        color: AppColors.error,
+                        onTap: onDelete,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: color.withAlpha(25),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, size: 18, color: color),
+      ),
+    );
   }
 }
 

@@ -184,6 +184,24 @@ class UserDashboardPage extends StatelessWidget {
                     },
                     isDark: isDark,
                   ),
+                  _DrawerItem(
+                    icon: Icons.assessment,
+                    label: 'Reportes',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/reportes');
+                    },
+                    isDark: isDark,
+                  ),
+                  _DrawerItem(
+                    icon: Icons.insights,
+                    label: 'Reportes Avanzados',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/reportes-avanzados');
+                    },
+                    isDark: isDark,
+                  ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(),

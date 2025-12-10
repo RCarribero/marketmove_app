@@ -180,6 +180,14 @@ class HomePage extends StatelessWidget {
                       context.push('/reportes');
                     },
                   ),
+                  _DrawerItem(
+                    icon: Icons.insights,
+                    label: 'Reportes Avanzados',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/reportes-avanzados');
+                    },
+                  ),
                   if (isAdmin) ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8),
