@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile_model.dart';
 import '../services/profile_service.dart';
+import '../../features/pricing/services/subscription_service.dart';
+import '../../features/pricing/models/pricing_plan.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SupabaseClient _client;
@@ -11,12 +13,21 @@ class AuthProvider extends ChangeNotifier {
 
   User? _user;
   Profile? _profile;
+  UserSubscription? _subscription;
   bool _isLoading = false;
 
   User? get user => _user;
   Profile? get profile => _profile;
+  UserSubscription? get subscription => _subscription;
   bool get isLoading => _isLoading;
   bool get isAdmin => _profile?.role == 'admin';
+
+  // Getters de suscripcion
+  bool get hasActiveSubscription =>
+      _subscription?.hasActiveSubscription ?? false;
+  bool get isTrialActive => _subscription?.isTrialActive ?? false;
+  int get trialDaysRemaining => _subscription?.trialDaysRemaining ?? 0;
+  String get currentPlanId => _subscription?.planId ?? 'free';
 
   /// Carga la sesión actual y el perfil del usuario.
   Future<void> loadSession() async {
@@ -28,8 +39,12 @@ class AuthProvider extends ChangeNotifier {
 
     if (_user != null) {
       _profile = await _profileService.getCurrentProfile();
+      // Cargar suscripcion
+      _subscription = await SubscriptionService.getSubscription();
+      await SubscriptionService.checkAndUpdateStatus();
     } else {
       _profile = null;
+      _subscription = null;
     }
 
     _isLoading = false;
@@ -48,6 +63,9 @@ class AuthProvider extends ChangeNotifier {
       _user = response.user;
       if (_user != null) {
         _profile = await _profileService.getCurrentProfile();
+        // Cargar suscripcion
+        _subscription = await SubscriptionService.getSubscription();
+        await SubscriptionService.checkAndUpdateStatus();
       }
     } finally {
       _isLoading = false;
@@ -70,6 +88,8 @@ class AuthProvider extends ChangeNotifier {
         // Pequeña espera para dar tiempo al trigger
         await Future.delayed(const Duration(seconds: 1));
         _profile = await _profileService.getCurrentProfile();
+        // Iniciar trial para nuevo usuario
+        _subscription = await SubscriptionService.startTrial();
       }
     } finally {
       _isLoading = false;
