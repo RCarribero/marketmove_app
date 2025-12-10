@@ -22,8 +22,10 @@ class VentasProvider extends ChangeNotifier {
 
     try {
       _sales = await _service.getAll();
+      print('Ventas loaded: ${_sales.length}');
     } catch (e) {
       _error = e.toString();
+      print('Error loading sales: $_error');
     } finally {
       _isLoading = false;
       notifyListeners();

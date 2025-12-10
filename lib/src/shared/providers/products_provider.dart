@@ -22,8 +22,10 @@ class ProductsProvider extends ChangeNotifier {
 
     try {
       _products = await _service.getAll();
+      print('Products loaded: ${_products.length}');
     } catch (e) {
       _error = e.toString();
+      print('Error loading products: $_error');
     } finally {
       _isLoading = false;
       notifyListeners();

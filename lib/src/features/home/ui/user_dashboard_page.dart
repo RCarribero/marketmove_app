@@ -7,14 +7,13 @@ import '../../../shared/theme/colors.dart';
 import '../../../shared/widgets/expandable_fab.dart';
 import 'dashboard_view.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class UserDashboardPage extends StatelessWidget {
+  const UserDashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final themeProvider = context.watch<ThemeProvider>();
-    final isAdmin = authProvider.isAdmin;
     final userEmail = authProvider.user?.email ?? 'Usuario';
     final isDark = themeProvider.isDarkMode;
 
@@ -30,13 +29,10 @@ class HomePage extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: isDark
                 ? null
-                : LinearGradient(
+                : const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary,
-                      AppColors.primary.withOpacity(0.8),
-                    ],
+                    colors: [AppColors.primary, AppColors.primaryLight],
                   ),
           ),
         ),
@@ -87,15 +83,26 @@ class HomePage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      userEmail[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: CircleAvatar(
+                      radius: 29,
+                      backgroundColor: isDark
+                          ? AppColors.darkSurface
+                          : AppColors.primary.withOpacity(0.1),
+                      child: Text(
+                        userEmail[0].toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -117,7 +124,7 @@ class HomePage extends StatelessWidget {
                           userEmail,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -139,6 +146,7 @@ class HomePage extends StatelessWidget {
                     label: 'Dashboard',
                     isSelected: true,
                     onTap: () => Navigator.pop(context),
+                    isDark: isDark,
                   ),
                   _DrawerItem(
                     icon: Icons.point_of_sale,
@@ -147,6 +155,7 @@ class HomePage extends StatelessWidget {
                       Navigator.pop(context);
                       context.push('/ventas');
                     },
+                    isDark: isDark,
                   ),
                   _DrawerItem(
                     icon: Icons.attach_money,
@@ -155,6 +164,7 @@ class HomePage extends StatelessWidget {
                       Navigator.pop(context);
                       context.push('/gastos');
                     },
+                    isDark: isDark,
                   ),
                   _DrawerItem(
                     icon: Icons.inventory_2_outlined,
@@ -163,6 +173,7 @@ class HomePage extends StatelessWidget {
                       Navigator.pop(context);
                       context.push('/productos');
                     },
+                    isDark: isDark,
                   ),
                   _DrawerItem(
                     icon: Icons.bar_chart,
@@ -171,48 +182,17 @@ class HomePage extends StatelessWidget {
                       Navigator.pop(context);
                       context.push('/resumen');
                     },
+                    isDark: isDark,
                   ),
-                  _DrawerItem(
-                    icon: Icons.assessment,
-                    label: 'Reportes',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/reportes');
-                    },
-                  ),
-                  if (isAdmin) ...[
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Divider(),
-                    ),
-                    _DrawerItem(
-                      icon: Icons.admin_panel_settings_outlined,
-                      label: 'Administrar Usuarios',
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.push('/admin');
-                      },
-                    ),
-                  ],
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(),
                   ),
-                  // Theme toggle in drawer
                   _DrawerItem(
                     icon: isDark ? Icons.light_mode : Icons.dark_mode,
                     label: isDark ? 'Modo Claro' : 'Modo Oscuro',
-                    onTap: () {
-                      themeProvider.toggleTheme();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.person_outline,
-                    label: 'Mi Perfil',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/perfil');
-                    },
+                    onTap: () => themeProvider.toggleTheme(),
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -229,6 +209,7 @@ class HomePage extends StatelessWidget {
                   context.read<AuthProvider>().signOut();
                   context.go('/login');
                 },
+                isDark: isDark,
               ),
             ),
           ],
@@ -246,6 +227,7 @@ class _DrawerItem extends StatefulWidget {
   final VoidCallback onTap;
   final bool isSelected;
   final Color? color;
+  final bool isDark;
 
   const _DrawerItem({
     required this.icon,
@@ -253,6 +235,7 @@ class _DrawerItem extends StatefulWidget {
     required this.onTap,
     this.isSelected = false,
     this.color,
+    required this.isDark,
   });
 
   @override
@@ -264,18 +247,19 @@ class _DrawerItemState extends State<_DrawerItem> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeColor =
         widget.color ??
-        (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary);
-    final activeColor = isDark ? AppColors.primaryLight : AppColors.primary;
+        (widget.isDark ? AppColors.darkTextPrimary : AppColors.textPrimary);
+    final activeColor = widget.isDark
+        ? AppColors.primaryLight
+        : AppColors.primary;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
           color: widget.isSelected
               ? activeColor.withOpacity(0.1)
@@ -291,6 +275,7 @@ class _DrawerItemState extends State<_DrawerItem> {
             child: Icon(
               widget.icon,
               color: widget.isSelected ? activeColor : themeColor,
+              size: 22,
             ),
           ),
           title: Text(
@@ -298,6 +283,7 @@ class _DrawerItemState extends State<_DrawerItem> {
             style: TextStyle(
               color: widget.isSelected ? activeColor : themeColor,
               fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.w500,
+              fontSize: 14,
             ),
           ),
           onTap: widget.onTap,
@@ -306,8 +292,9 @@ class _DrawerItemState extends State<_DrawerItem> {
           ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 4,
+            vertical: 2,
           ),
+          dense: true,
         ),
       ),
     );

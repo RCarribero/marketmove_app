@@ -42,10 +42,13 @@ class ExpenseService {
   }
 
   Future<Expense> update(Expense expense) async {
+    if (expense.id == null) {
+      throw Exception('Expense ID is required for update');
+    }
     final response = await _client
         .from('gastos')
         .update(expense.toJson())
-        .eq('id', expense.id)
+        .eq('id', expense.id!)
         .select()
         .single();
     return Expense.fromJson(response);

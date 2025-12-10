@@ -79,7 +79,13 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (mounted) {
-        context.go('/home');
+        // Check if user is admin
+        final authProvider = context.read<AuthProvider>();
+        if (authProvider.isAdmin) {
+          context.go('/home');
+        } else {
+          context.go('/user-dashboard');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -90,60 +96,159 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _signUp() async {
-    // Clear previous errors
-    setState(() => _error = null);
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController(text: _emailController.text);
+    bool isLoading = false;
+    String? dialogError;
+    String? successMessage;
 
-    // Validate inputs
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    if (email.isEmpty) {
-      setState(() => _error = 'Por favor ingresa tu correo electrónico');
-      return;
-    }
-
-    if (!email.contains('@')) {
-      setState(() => _error = 'Correo electrónico inválido');
-      return;
-    }
-
-    if (password.isEmpty) {
-      setState(() => _error = 'Por favor ingresa una contraseña');
-      return;
-    }
-
-    if (password.length < 6) {
-      setState(() => _error = 'La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    try {
-      // DEBUG: Ver qué se está enviando
-      print(
-        '🔍 DEBUG SignUp - Email: "$email", Password length: ${password.length}',
-      );
-
-      await context.read<AuthProvider>().signUp(email, password);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cuenta creada. Por favor inicia sesión.'),
-            backgroundColor: Colors.green,
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-        );
-        // Clear fields after successful signup
-        _emailController.clear();
-        _passwordController.clear();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = _parseError(e);
-        });
-      }
-    }
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.lock_reset, color: AppColors.primary),
+              ),
+              const SizedBox(width: 12),
+              const Text('Recuperar Contraseña'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Ingresa tu correo electronico y te enviaremos un enlace para restablecer tu contraseña.',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Correo Electronico',
+                  hintText: 'tu@email.com',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              if (dialogError != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    dialogError!,
+                    style: const TextStyle(
+                      color: AppColors.error,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+              if (successMessage != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: AppColors.success,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          successMessage!,
+                          style: const TextStyle(
+                            color: AppColors.success,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            if (successMessage == null)
+              ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        final email = emailController.text.trim();
+                        if (email.isEmpty || !email.contains('@')) {
+                          setDialogState(() {
+                            dialogError = 'Ingresa un correo valido';
+                          });
+                          return;
+                        }
+
+                        setDialogState(() {
+                          isLoading = true;
+                          dialogError = null;
+                        });
+
+                        try {
+                          await context.read<AuthProvider>().resetPassword(
+                            email,
+                          );
+                          setDialogState(() {
+                            successMessage =
+                                'Se envio un enlace de recuperacion a $email';
+                            isLoading = false;
+                          });
+                        } catch (e) {
+                          setDialogState(() {
+                            dialogError =
+                                'Error al enviar el email. Intenta nuevamente.';
+                            isLoading = false;
+                          });
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Enviar Enlace'),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -251,6 +356,29 @@ class _LoginPageState extends State<LoginPage> {
                                 prefixIcon: Icon(Icons.lock_outline),
                               ),
                               obscureText: true,
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Forgot Password Link
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => _showForgotPasswordDialog(),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  'Olvide mi contraseña',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
                             ),
 
                             // Error Message

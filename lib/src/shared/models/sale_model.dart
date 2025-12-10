@@ -3,7 +3,7 @@
 /// Corresponde a la tabla 'ventas' en Supabase.
 class Sale {
   /// Identificador único de la venta.
-  final int id;
+  final int? id;
 
   /// ID del usuario propietario de la venta (Supabase Auth).
   final String? userId;
@@ -23,7 +23,7 @@ class Sale {
 
   /// Constructor inmutable para crear una instancia de [Sale].
   const Sale({
-    required this.id,
+    this.id,
     this.userId,
     required this.total,
     required this.date,
@@ -52,14 +52,16 @@ class Sale {
 
   /// Convierte la instancia a un mapa JSON compatible con Supabase.
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
       'user_id': userId,
       'total': total,
       'date': date.toIso8601String(),
-      'customerName': customerName,
+      'customername':
+          customerName, // Lowercase in DB usually? Schema said customername
       'items': items,
     };
+    if (id != null) map['id'] = id;
+    return map;
   }
 
   /// Crea una instancia de [Sale] a partir de un mapa JSON.
@@ -69,7 +71,7 @@ class Sale {
       userId: json['user_id'] as String?,
       total: (json['total'] as num).toDouble(),
       date: DateTime.parse(json['date'] as String),
-      customerName: json['customerName'] as String?,
+      customerName: json['customername'] as String?,
       items: List<Map<String, dynamic>>.from(json['items'] as List),
     );
   }

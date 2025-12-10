@@ -37,6 +37,18 @@ dependencies:
   go_router: ^17.0.0
   supabase_flutter: ^2.10.3
   provider: ^6.1.5+1
+  intl: ^0.20.2
+  fl_chart: ^0.70.2
+  shimmer: ^3.0.0
+  flutter_speed_dial: ^7.0.0
+  another_flushbar: ^1.12.30
+  animated_text_kit: ^4.2.2
+  shared_preferences: ^2.3.5
+  excel: ^4.0.6
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+  url_launcher: ^6.3.1
+  flutter_email_sender: ^6.0.3
 
 dev_dependencies:
   flutter_test:

@@ -10,6 +10,7 @@ import 'src/shared/providers/products_provider.dart';
 import 'src/shared/providers/ventas_provider.dart';
 import 'src/shared/providers/gastos_provider.dart';
 import 'src/shared/providers/auth_provider.dart';
+import 'src/shared/providers/theme_provider.dart';
 import 'src/shared/theme/app_theme.dart';
 
 void main() async {
@@ -35,6 +36,7 @@ class MarketMoveApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(
           create: (_) =>
               AuthProvider(supabaseClient, profileService)..loadSession(),
@@ -49,11 +51,17 @@ class MarketMoveApp extends StatelessWidget {
           create: (_) => GastosProvider(ExpenseService(supabaseClient)),
         ),
       ],
-      child: MaterialApp.router(
-        title: 'MarketMove App',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        routerConfig: router,
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp.router(
+            title: 'MarketMove App',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            routerConfig: router,
+          );
+        },
       ),
     );
   }

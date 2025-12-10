@@ -101,4 +101,86 @@ class AuthProvider extends ChangeNotifier {
     _profile = null;
     notifyListeners();
   }
+
+  /// Envia email para restablecer contraseña
+  Future<void> resetPassword(String email) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _client.auth.resetPasswordForEmail(email);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Cambia la contraseña del usuario actual
+  Future<void> updatePassword(String newPassword) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _client.auth.updateUser(UserAttributes(password: newPassword));
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Actualiza el email del usuario
+  Future<void> updateEmail(String newEmail) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _client.auth.updateUser(UserAttributes(email: newEmail));
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Obtiene las identidades vinculadas del usuario
+  List<UserIdentity> getLinkedIdentities() {
+    return _user?.identities ?? [];
+  }
+
+  /// Vincula una identidad OAuth
+  Future<void> linkIdentity(OAuthProvider provider) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _client.auth.linkIdentity(provider);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Desvincula una identidad OAuth
+  Future<void> unlinkIdentity(UserIdentity identity) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _client.auth.unlinkIdentity(identity);
+      // Recargar usuario
+      await loadSession();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Refresca los datos del usuario
+  Future<void> refreshUser() async {
+    final session = _client.auth.currentSession;
+    _user = session?.user;
+    if (_user != null) {
+      _profile = await _profileService.getCurrentProfile();
+    }
+    notifyListeners();
+  }
 }

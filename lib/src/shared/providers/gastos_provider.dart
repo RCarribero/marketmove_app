@@ -31,8 +31,10 @@ class GastosProvider extends ChangeNotifier {
       } else {
         _expenses = await _service.getAll();
       }
+      print('Gastos loaded: ${_expenses.length}');
     } catch (e) {
       _error = e.toString();
+      print('Error loading expenses: $_error');
     } finally {
       _isLoading = false;
       notifyListeners();

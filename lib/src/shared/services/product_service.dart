@@ -10,7 +10,7 @@ class ProductService {
     final response = await _client
         .from('productos')
         .select()
-        .order('createdAt');
+        .order('createdat');
     return (response as List).map((e) => Product.fromJson(e)).toList();
   }
 
@@ -33,10 +33,13 @@ class ProductService {
   }
 
   Future<Product> update(Product product) async {
+    if (product.id == null) {
+      throw Exception('Product ID is required for update');
+    }
     final response = await _client
         .from('productos')
         .update(product.toJson())
-        .eq('id', product.id)
+        .eq('id', product.id!)
         .select()
         .single();
     return Product.fromJson(response);

@@ -33,10 +33,13 @@ class SaleService {
   }
 
   Future<Sale> update(Sale sale) async {
+    if (sale.id == null) {
+      throw Exception('Sale ID is required for update');
+    }
     final response = await _client
         .from('ventas')
         .update(sale.toJson())
-        .eq('id', sale.id)
+        .eq('id', sale.id!)
         .select()
         .single();
     return Sale.fromJson(response);

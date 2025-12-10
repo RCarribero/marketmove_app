@@ -3,7 +3,7 @@
 /// Corresponde a la tabla 'gastos' en Supabase.
 class Expense {
   /// Identificador único del gasto.
-  final int id;
+  final int? id;
 
   /// ID del usuario propietario del gasto (Supabase Auth).
   final String? userId;
@@ -22,7 +22,7 @@ class Expense {
 
   /// Constructor inmutable para crear una instancia de [Expense].
   const Expense({
-    required this.id,
+    this.id,
     this.userId,
     required this.amount,
     required this.description,
@@ -51,14 +51,15 @@ class Expense {
 
   /// Convierte la instancia a un mapa JSON compatible con Supabase.
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
       'user_id': userId,
       'amount': amount,
       'description': description,
       'category': category,
       'date': date.toIso8601String(),
     };
+    if (id != null) map['id'] = id;
+    return map;
   }
 
   /// Crea una instancia de [Expense] a partir de un mapa JSON.

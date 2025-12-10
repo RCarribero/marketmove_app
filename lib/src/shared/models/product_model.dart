@@ -3,7 +3,7 @@
 /// Corresponde a la tabla 'productos' en Supabase.
 class Product {
   /// Identificador único del producto.
-  final int id;
+  final int? id;
 
   /// ID del usuario propietario del producto (Supabase Auth).
   final String? userId;
@@ -24,18 +24,18 @@ class Product {
   final String? imageUrl;
 
   /// Fecha de creación del registro.
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// Constructor inmutable para crear una instancia de [Product].
   const Product({
-    required this.id,
+    this.id,
     this.userId,
     required this.name,
     required this.price,
     required this.stock,
     this.description,
     this.imageUrl,
-    required this.createdAt,
+    this.createdAt,
   });
 
   /// Crea una copia de esta instancia con los campos modificados.
@@ -63,16 +63,18 @@ class Product {
 
   /// Convierte la instancia a un mapa JSON compatible con Supabase.
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
       'user_id': userId,
       'name': name,
       'price': price,
       'stock': stock,
       'description': description,
-      'imageUrl': imageUrl,
-      'createdAt': createdAt.toIso8601String(),
+      'imageurl':
+          imageUrl, // Note: DB column is imageurl (lowercase usually in postgres unless quoted) but schema said imageurl
     };
+    if (id != null) map['id'] = id;
+    if (createdAt != null) map['createdat'] = createdAt!.toIso8601String();
+    return map;
   }
 
   /// Crea una instancia de [Product] a partir de un mapa JSON.
@@ -84,8 +86,10 @@ class Product {
       price: (json['price'] as num).toDouble(),
       stock: json['stock'] as int,
       description: json['description'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      imageUrl: json['imageurl'] as String?, // DB column name
+      createdAt: json['createdat'] != null
+          ? DateTime.parse(json['createdat'] as String)
+          : null,
     );
   }
 }
