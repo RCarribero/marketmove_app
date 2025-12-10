@@ -101,7 +101,12 @@ class _PricingScreenState extends State<PricingScreen>
 
     // Abrir Stripe para pagar
     if (plan.stripeUrl.isNotEmpty) {
-      final uri = Uri.parse(plan.stripeUrl);
+      // Agregar email del usuario para pre-llenar en Stripe
+      final userEmail = authProvider.user?.email ?? '';
+      final stripeUrlWithEmail =
+          '${plan.stripeUrl}?prefilled_email=${Uri.encodeComponent(userEmail)}';
+
+      final uri = Uri.parse(stripeUrlWithEmail);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
 

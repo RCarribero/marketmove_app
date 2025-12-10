@@ -17,7 +17,11 @@ serve(async (req) => {
             const session = event.data.object
             const customerEmail = session.customer_email || session.customer_details?.email
 
+            console.log('Webhook received for email:', customerEmail)
+            console.log('Session amount:', session.amount_total)
+
             if (!customerEmail) {
+                console.log('ERROR: No email found in session')
                 return new Response(JSON.stringify({ error: 'No email found' }), { status: 400 })
             }
 
@@ -34,15 +38,21 @@ serve(async (req) => {
                 isAnnual = true
             }
 
+            console.log('Plan determined:', planId, 'isAnnual:', isAnnual)
+
             // Conectar a Supabase
             const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
             // Buscar usuario por email
             const { data: users } = await supabase.auth.admin.listUsers()
+            console.log('Total users in DB:', users.users.length)
+
             const user = users.users.find(u => u.email === customerEmail)
+            console.log('User found:', user ? user.id : 'NOT FOUND')
 
             if (!user) {
-                return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 })
+                console.log('ERROR: User not found for email:', customerEmail)
+                return new Response(JSON.stringify({ error: 'User not found', email: customerEmail }), { status: 404 })
             }
 
             // Calcular fecha de fin

@@ -717,7 +717,7 @@ class _DashboardViewState extends State<DashboardView>
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: maxY / 4,
+          horizontalInterval: maxY > 0 ? maxY / 4 : 25,
           getDrawingHorizontalLine: (value) => FlLine(
             color: isDark ? AppColors.darkSurfaceVariant : Colors.grey.shade200,
             strokeWidth: 1,
