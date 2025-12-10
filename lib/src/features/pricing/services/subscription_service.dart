@@ -87,7 +87,7 @@ class SubscriptionService {
     }
   }
 
-  /// Iniciar trial (solo si el dispositivo no ha tenido uno)
+  /// Iniciar trial para usuario nuevo
   static Future<UserSubscription?> startTrial({
     String planId = 'pro',
     int trialDays = 30,
@@ -95,9 +95,10 @@ class SubscriptionService {
     final user = _supabase.auth.currentUser;
     if (user == null) return null;
 
-    // Verificar si el dispositivo ya tuvo trial
-    if (await hasDeviceUsedTrial()) {
-      return null; // No permitir segundo trial
+    // Verificar si el usuario ya tiene suscripcion
+    final existing = await getSubscription();
+    if (existing != null) {
+      return existing; // Ya tiene suscripcion, retornarla
     }
 
     final deviceId = await getDeviceId();
@@ -105,7 +106,7 @@ class SubscriptionService {
     final trialEnd = now.add(Duration(days: trialDays));
 
     try {
-      await _supabase.from('subscriptions').upsert({
+      await _supabase.from('subscriptions').insert({
         'user_id': user.id,
         'device_id': deviceId,
         'plan_id': planId,
@@ -113,7 +114,7 @@ class SubscriptionService {
         'trial_start': now.toIso8601String(),
         'trial_end': trialEnd.toIso8601String(),
         'updated_at': now.toIso8601String(),
-      }, onConflict: 'user_id');
+      });
 
       return UserSubscription.startTrial(
         odId: user.id,
@@ -121,7 +122,8 @@ class SubscriptionService {
         trialDays: trialDays,
       );
     } catch (e) {
-      return null;
+      // Si falla por conflicto, intentar obtener la suscripcion existente
+      return await getSubscription();
     }
   }
 

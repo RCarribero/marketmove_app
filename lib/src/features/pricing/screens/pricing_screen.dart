@@ -89,10 +89,10 @@ class _PricingScreenState extends State<PricingScreen>
   Future<void> _handleSelectPlan(PricingPlan plan) async {
     final authProvider = context.read<AuthProvider>();
 
-    // Si no esta logueado, ir a login primero
+    // Si no esta logueado, mostrar dialogo de login
     if (authProvider.user == null) {
-      if (mounted) context.push('/login');
-      return;
+      final loggedIn = await _showLoginDialog();
+      if (!loggedIn) return;
     }
 
     // Mostrar modal de terminos
@@ -105,51 +105,197 @@ class _PricingScreenState extends State<PricingScreen>
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
 
-        // Mostrar dialogo para confirmar pago (simulacion)
+        // Mostrar dialogo de espera con polling
         if (mounted) {
-          final confirmed = await showDialog<bool>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Confirmar Pago'),
-              content: const Text('Has completado el pago en Stripe?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('No'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Si, ya pague'),
-                ),
-              ],
-            ),
-          );
+          final success = await _showPaymentWaitingDialog();
 
-          if (confirmed == true) {
-            // Activar suscripcion en BD
-            final success = await SubscriptionService.activateSubscription(
-              planId: plan.id,
-              isAnnual: plan.id == 'annual' || plan.id == 'lifetime',
+          if (success && mounted) {
+            // Recargar auth provider
+            await authProvider.loadSession();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Suscripcion activada con exito!'),
+                backgroundColor: Colors.green,
+              ),
             );
 
-            if (success && mounted) {
-              // Recargar auth provider
-              await authProvider.loadSession();
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Suscripcion activada con exito!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-
-              // Ir a home
-              context.go('/home');
-            }
+            // Ir a home
+            context.go('/home');
           }
         }
       }
     }
+  }
+
+  /// Dialogo que hace polling esperando confirmacion de Stripe
+  Future<bool> _showPaymentWaitingDialog() async {
+    bool isWaiting = true;
+    bool paymentConfirmed = false;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          // Iniciar polling
+          if (isWaiting && !paymentConfirmed) {
+            Future.delayed(const Duration(seconds: 3), () async {
+              if (!isWaiting) return;
+
+              // Verificar si la suscripcion se activo
+              final sub = await SubscriptionService.getSubscription();
+              if (sub != null && sub.status == SubscriptionStatus.active) {
+                paymentConfirmed = true;
+                Navigator.pop(ctx, true);
+              } else if (isWaiting) {
+                // Continuar polling
+                setDialogState(() {});
+              }
+            });
+          }
+
+          return AlertDialog(
+            title: const Text('Esperando Pago'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Completa el pago en Stripe.\nEsta ventana se cerrara automaticamente.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Verificando pago...',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  isWaiting = false;
+                  Navigator.pop(ctx, false);
+                },
+                child: const Text('Cancelar'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    return result == true;
+  }
+
+  Future<bool> _showLoginDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final authProvider = context.read<AuthProvider>();
+    bool isLoading = false;
+    String? errorMessage;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Iniciar Sesion'),
+          content: SizedBox(
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Inicia sesion para continuar con tu compra',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Contrasena',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                ),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      Navigator.pop(ctx, false);
+                      context.push('/register');
+                    },
+              child: const Text('Crear Cuenta'),
+            ),
+            FilledButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      setDialogState(() {
+                        isLoading = true;
+                        errorMessage = null;
+                      });
+                      try {
+                        await authProvider.signIn(
+                          emailController.text.trim(),
+                          passwordController.text,
+                        );
+                        if (authProvider.user != null) {
+                          Navigator.pop(ctx, true);
+                        } else {
+                          setDialogState(() {
+                            errorMessage = 'Credenciales incorrectas';
+                            isLoading = false;
+                          });
+                        }
+                      } catch (e) {
+                        setDialogState(() {
+                          errorMessage = 'Error al iniciar sesion';
+                          isLoading = false;
+                        });
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Entrar'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return result == true;
   }
 
   void _openStripeCheckout(String planId) async {
