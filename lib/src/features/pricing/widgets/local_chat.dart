@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../l10n/pricing_strings.dart';
 import '../../../shared/theme/colors.dart';
+import '../../../shared/services/gemini_service.dart';
 
-/// Widget de chat local con respuestas predefinidas y FAQ
+/// Widget de chat con IA (Gemini) y FAQ
 class LocalChat extends StatefulWidget {
   final bool isDark;
 
@@ -15,6 +16,7 @@ class LocalChat extends StatefulWidget {
 class _LocalChatState extends State<LocalChat> {
   final _controller = TextEditingController();
   final _messages = <ChatMessage>[];
+  final _gemini = GeminiService();
   bool _isTyping = false;
 
   final _faqs = [
@@ -45,22 +47,7 @@ class _LocalChatState extends State<LocalChat> {
     ),
   ];
 
-  final _autoResponses = <String, String>{
-    'precio':
-        'Tenemos 3 planes: Free (gratis), Pro (\$29/mes) y Enterprise (\$99/mes). Cual te interesa?',
-    'trial':
-        'Ofrecemos 30 dias de prueba gratis del plan Pro. No necesitas tarjeta de credito para comenzar.',
-    'cancelar':
-        'Puedes cancelar tu suscripcion en cualquier momento desde tu perfil. No hay penalizaciones.',
-    'pago':
-        'Aceptamos tarjetas de credito, debito y PayPal. Los pagos son procesados de forma segura.',
-    'soporte':
-        'Nuestro equipo esta disponible por email 24/7. Los planes Pro y Enterprise tienen soporte prioritario.',
-    'garantia':
-        'Ofrecemos garantia de 30 dias. Si no estas satisfecho, te devolvemos tu dinero.',
-  };
-
-  void _sendMessage(String text) {
+  void _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
     setState(() {
@@ -69,33 +56,38 @@ class _LocalChatState extends State<LocalChat> {
     });
     _controller.clear();
 
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) {
-        setState(() {
-          _isTyping = false;
-          _messages.add(ChatMessage(text: _getResponse(text), isUser: false));
-        });
-      }
-    });
-  }
+    // Obtener respuesta de Gemini
+    final response = await _gemini.sendMessage(text);
 
-  String _getResponse(String input) {
-    final lower = input.toLowerCase();
-
-    for (final entry in _autoResponses.entries) {
-      if (lower.contains(entry.key)) {
-        return entry.value;
-      }
+    if (mounted) {
+      setState(() {
+        _isTyping = false;
+        _messages.add(ChatMessage(text: response, isUser: false));
+      });
     }
-
-    return 'Gracias por tu mensaje. Para respuestas mas especificas, revisa nuestras FAQ o contacta a soporte@micrm.com';
   }
 
-  void _selectFaq(FAQ faq) {
+  void _selectFaq(FAQ faq) async {
     setState(() {
       _messages.add(ChatMessage(text: faq.question, isUser: true));
-      _messages.add(ChatMessage(text: faq.answer, isUser: false));
+      _isTyping = true;
     });
+
+    // Obtener respuesta de IA para la FAQ
+    final response = await _gemini.sendMessage(faq.question);
+
+    if (mounted) {
+      setState(() {
+        _isTyping = false;
+        _messages.add(ChatMessage(text: response, isUser: false));
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override

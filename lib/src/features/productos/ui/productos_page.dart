@@ -317,7 +317,7 @@ class _ProductosPageState extends State<ProductosPage>
                         height: 220,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -329,7 +329,7 @@ class _ProductosPageState extends State<ProductosPage>
                         height: 160,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -339,7 +339,7 @@ class _ProductosPageState extends State<ProductosPage>
                       child: Icon(
                         Icons.inventory_2,
                         size: 80,
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                       ),
                     ),
                   ],
@@ -934,8 +934,8 @@ class _ProductCardState extends State<_ProductCard>
                       ),
                       decoration: BoxDecoration(
                         color: isLowStock
-                            ? AppColors.warning.withOpacity(0.1)
-                            : AppColors.success.withOpacity(0.1),
+                            ? AppColors.warning.withValues(alpha: 0.1)
+                            : AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(

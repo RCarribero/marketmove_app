@@ -1,89 +1,89 @@
-/// Recomendador de plan basado en respuestas del usuario (IA simulada)
+/// Recomendador de plan basado en respuestas del usuario
 class PlanRecommender {
   /// Preguntas para el quiz de recomendacion
   static List<RecommenderQuestion> getQuestions() {
     return [
       RecommenderQuestion(
-        id: 'team_size',
-        question: 'Cuantas personas usaran el CRM?',
+        id: 'usage_frequency',
+        question: 'Con que frecuencia usaras el CRM?',
         options: [
           QuestionOption(
-            value: '1',
-            label: 'Solo yo',
-            points: {'free': 3, 'pro': 1, 'enterprise': 0},
+            value: 'occasional',
+            label: 'Ocasionalmente',
+            points: {'monthly': 3, 'annual': 1, 'lifetime': 0},
           ),
           QuestionOption(
-            value: '2-5',
-            label: '2-5 personas',
-            points: {'free': 0, 'pro': 3, 'enterprise': 1},
+            value: 'regular',
+            label: 'Regularmente (varias veces por semana)',
+            points: {'monthly': 1, 'annual': 3, 'lifetime': 1},
           ),
           QuestionOption(
-            value: '5+',
-            label: 'Mas de 5',
-            points: {'free': 0, 'pro': 1, 'enterprise': 3},
+            value: 'daily',
+            label: 'A diario, es mi herramienta principal',
+            points: {'monthly': 0, 'annual': 2, 'lifetime': 3},
           ),
         ],
       ),
       RecommenderQuestion(
-        id: 'contacts',
-        question: 'Cuantos contactos gestionas aproximadamente?',
+        id: 'time_horizon',
+        question: 'Por cuanto tiempo planeas usar el CRM?',
         options: [
           QuestionOption(
-            value: '<100',
-            label: 'Menos de 100',
-            points: {'free': 3, 'pro': 1, 'enterprise': 0},
+            value: 'short',
+            label: 'Solo unos meses',
+            points: {'monthly': 3, 'annual': 0, 'lifetime': 0},
           ),
           QuestionOption(
-            value: '100-1000',
-            label: '100 - 1,000',
-            points: {'free': 1, 'pro': 3, 'enterprise': 1},
+            value: 'year',
+            label: 'Al menos un año',
+            points: {'monthly': 0, 'annual': 3, 'lifetime': 1},
           ),
           QuestionOption(
-            value: '1000+',
-            label: 'Mas de 1,000',
-            points: {'free': 0, 'pro': 2, 'enterprise': 3},
+            value: 'long',
+            label: 'Varios años, es para mi negocio',
+            points: {'monthly': 0, 'annual': 1, 'lifetime': 3},
           ),
         ],
       ),
       RecommenderQuestion(
-        id: 'automation',
-        question: 'Necesitas automatizaciones?',
+        id: 'budget',
+        question: 'Cual es tu preferencia de pago?',
         options: [
           QuestionOption(
-            value: 'no',
-            label: 'No las necesito',
-            points: {'free': 3, 'pro': 1, 'enterprise': 0},
+            value: 'low_monthly',
+            label: 'Prefiero pagar poco cada mes',
+            points: {'monthly': 3, 'annual': 1, 'lifetime': 0},
           ),
           QuestionOption(
-            value: 'basic',
-            label: 'Basicas',
-            points: {'free': 0, 'pro': 3, 'enterprise': 1},
+            value: 'save_annual',
+            label: 'Puedo pagar anual para ahorrar',
+            points: {'monthly': 0, 'annual': 3, 'lifetime': 1},
           ),
           QuestionOption(
-            value: 'advanced',
-            label: 'Avanzadas',
-            points: {'free': 0, 'pro': 1, 'enterprise': 3},
+            value: 'one_time',
+            label: 'Prefiero un pago unico y olvidarme',
+            points: {'monthly': 0, 'annual': 0, 'lifetime': 3},
           ),
         ],
       ),
       RecommenderQuestion(
-        id: 'support',
-        question: 'Que nivel de soporte necesitas?',
+        id: 'business_stage',
+        question: 'En que etapa esta tu negocio?',
         options: [
           QuestionOption(
-            value: 'email',
-            label: 'Email es suficiente',
-            points: {'free': 3, 'pro': 1, 'enterprise': 0},
+            value: 'starting',
+            label: 'Estoy empezando',
+            points: {'monthly': 3, 'annual': 1, 'lifetime': 0},
           ),
           QuestionOption(
-            value: 'priority',
-            label: 'Soporte prioritario',
-            points: {'free': 0, 'pro': 3, 'enterprise': 1},
+            value: 'growing',
+            label: 'En crecimiento',
+            points: {'monthly': 1, 'annual': 3, 'lifetime': 2},
           ),
           QuestionOption(
-            value: 'dedicated',
-            label: 'Manager dedicado',
-            points: {'free': 0, 'pro': 0, 'enterprise': 3},
+            value: 'established',
+            label: 'Negocio establecido',
+            points: {'monthly': 0, 'annual': 2, 'lifetime': 3},
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class PlanRecommender {
 
   /// Calcular recomendacion basado en respuestas
   static RecommendationResult getRecommendation(Map<String, String> answers) {
-    final scores = {'free': 0, 'pro': 0, 'enterprise': 0};
+    final scores = {'monthly': 0, 'annual': 0, 'lifetime': 0};
     final questions = getQuestions();
 
     for (final question in questions) {
@@ -110,7 +110,7 @@ class PlanRecommender {
     }
 
     // Determinar plan recomendado
-    String recommendedPlan = 'pro';
+    String recommendedPlan = 'annual';
     int maxScore = 0;
 
     for (final entry in scores.entries) {
@@ -131,34 +131,35 @@ class PlanRecommender {
     final reasons = <String>[];
 
     switch (planId) {
-      case 'free':
-        reasons.add('Perfecto para comenzar sin costo');
-        if (answers['team_size'] == '1') {
-          reasons.add('Ideal para uso individual');
+      case 'monthly':
+        reasons.add('Flexibilidad para cancelar cuando quieras');
+        if (answers['usage_frequency'] == 'occasional') {
+          reasons.add('Ideal para uso ocasional');
         }
-        if (answers['contacts'] == '<100') {
-          reasons.add('100 contactos son suficientes para ti');
+        if (answers['business_stage'] == 'starting') {
+          reasons.add('Perfecto para probar sin compromiso');
         }
+        reasons.add('Pago mensual de \$29');
         break;
-      case 'pro':
+      case 'annual':
         reasons.add('Mejor relacion calidad-precio');
-        if (answers['team_size'] == '2-5') {
-          reasons.add('Incluye 5 usuarios para tu equipo');
+        if (answers['time_horizon'] == 'year') {
+          reasons.add('Ahorras \$49 al año');
         }
-        if (answers['automation'] == 'basic') {
-          reasons.add('Automatizaciones incluidas');
+        if (answers['usage_frequency'] == 'regular') {
+          reasons.add('Ideal para uso regular');
         }
-        reasons.add('Soporte prioritario incluido');
+        reasons.add('Equivale a \$24.92/mes');
         break;
-      case 'enterprise':
-        reasons.add('Sin limites para escalar');
-        if (answers['team_size'] == '5+') {
-          reasons.add('Usuarios ilimitados para equipos grandes');
+      case 'lifetime':
+        reasons.add('Pago unico, acceso de por vida');
+        if (answers['time_horizon'] == 'long') {
+          reasons.add('Se paga solo en menos de 3 años');
         }
-        if (answers['contacts'] == '1000+') {
-          reasons.add('Contactos ilimitados');
+        if (answers['business_stage'] == 'established') {
+          reasons.add('Inversion inteligente para tu negocio');
         }
-        reasons.add('Manager de cuenta dedicado');
+        reasons.add('Sin pagos recurrentes');
         break;
     }
 

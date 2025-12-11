@@ -43,7 +43,6 @@ class EmailService {
 
       return true;
     } catch (e) {
-      print('Error enviando email: $e');
       rethrow;
     }
   }

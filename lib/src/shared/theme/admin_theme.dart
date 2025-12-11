@@ -11,10 +11,10 @@ class AdminTheme {
   static final cardDecoration = BoxDecoration(
     color: AppColors.surface,
     borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
     boxShadow: [
       BoxShadow(
-        color: AppColors.primary.withOpacity(0.05),
+        color: AppColors.primary.withValues(alpha: 0.05),
         blurRadius: 10,
         offset: const Offset(0, 4),
       ),

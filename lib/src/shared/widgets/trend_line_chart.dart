@@ -39,7 +39,7 @@ class TrendLineChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -85,8 +85,8 @@ class TrendLineChart extends StatelessWidget {
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.grey.withOpacity(0.2),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.grey.withValues(alpha: 0.2),
                       strokeWidth: 1,
                     );
                   },
@@ -180,7 +180,10 @@ class TrendLineChart extends StatelessWidget {
           );
         },
       ),
-      belowBarData: BarAreaData(show: true, color: color.withOpacity(0.1)),
+      belowBarData: BarAreaData(
+        show: true,
+        color: color.withValues(alpha: 0.1),
+      ),
     );
   }
 }

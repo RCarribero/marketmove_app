@@ -75,10 +75,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      print(
-        '🔍 DEBUG Register - Email: "$email", Password length: ${password.length}',
-      );
-
       await context.read<AuthProvider>().signUp(email, password);
 
       if (mounted) {
@@ -95,7 +91,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ],
             ),
-            backgroundColor: const Color(0xFF4CAF50).withOpacity(0.85),
+            backgroundColor: const Color(0xFF4CAF50).withValues(alpha: 0.85),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -108,9 +104,9 @@ class _RegisterPageState extends State<RegisterPage> {
         // Wait a bit before navigating
         await Future.delayed(const Duration(milliseconds: 500));
 
-        // Navigate to login with email
+        // Navigate to plan selection
         if (mounted) {
-          context.go('/login?email=$email');
+          context.go('/plan-selection');
         }
       }
     } catch (e) {
@@ -134,7 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
             end: Alignment.bottomRight,
             colors: [
               AppColors.primary,
-              AppColors.primary.withOpacity(0.8),
+              AppColors.primary.withValues(alpha: 0.8),
               AppColors.secondary,
             ],
           ),
@@ -156,7 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -186,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     'Únete a MarketMove',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -197,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     constraints: const BoxConstraints(maxWidth: 400),
                     child: Card(
                       elevation: 8,
-                      shadowColor: Colors.black.withOpacity(0.2),
+                      shadowColor: Colors.black.withValues(alpha: 0.2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -247,10 +243,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.error.withOpacity(0.1),
+                                  color: AppColors.error.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.error.withOpacity(0.3),
+                                    color: AppColors.error.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
                                 child: Row(

@@ -1,14 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/theme/colors.dart';
 import '../../../shared/widgets/expandable_fab.dart';
+import '../../../shared/services/interactive_tutorial_service.dart';
 import 'dashboard_view.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // Keys para el tutorial
+  final GlobalKey _menuKey = GlobalKey();
+  final GlobalKey _themeKey = GlobalKey();
+  final GlobalKey _fabKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    // Mostrar tutorial interactivo si es la primera vez
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final hasShown = await InteractiveTutorialService.hasShownTutorial();
+      if (!hasShown && mounted) {
+        // Esperar un poco para que la UI se renderice
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) _showInteractiveTutorial();
+      }
+    });
+  }
+
+  void _showInteractiveTutorial() {
+    final targets = <TargetFocus>[
+      InteractiveTutorialService.createTarget(
+        key: _menuKey,
+        title: 'Menu Principal',
+        description:
+            'Abre el menu lateral para navegar entre secciones: Ventas, Gastos, Productos, Reportes y mas.',
+        align: ContentAlign.bottom,
+        shape: ShapeLightFocus.Circle,
+      ),
+      InteractiveTutorialService.createTarget(
+        key: _themeKey,
+        title: 'Cambiar Tema',
+        description: 'Cambia entre modo claro y oscuro segun tu preferencia.',
+        align: ContentAlign.bottom,
+        shape: ShapeLightFocus.Circle,
+      ),
+      InteractiveTutorialService.createTarget(
+        key: _fabKey,
+        title: 'Acciones Rapidas',
+        description:
+            'Pulsa aqui para agregar rapidamente una venta, gasto o producto nuevo.',
+        align: ContentAlign.top,
+        shape: ShapeLightFocus.Circle,
+      ),
+    ];
+
+    InteractiveTutorialService.showTutorial(context: context, targets: targets);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +76,13 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            key: _menuKey,
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text(
           'MarketMove',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
@@ -35,13 +98,14 @@ class HomePage extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: [
                       AppColors.primary,
-                      AppColors.primary.withOpacity(0.8),
+                      AppColors.primary.withValues(alpha: 0.8),
                     ],
                   ),
           ),
         ),
         actions: [
           IconButton(
+            key: _themeKey,
             icon: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) {
@@ -116,7 +180,7 @@ class HomePage extends StatelessWidget {
                         Text(
                           userEmail,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 14,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -188,6 +252,18 @@ class HomePage extends StatelessWidget {
                       context.push('/reportes-avanzados');
                     },
                   ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Divider(),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.auto_awesome,
+                    label: 'Asistente IA',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/chat');
+                    },
+                  ),
                   if (isAdmin) ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8),
@@ -222,6 +298,16 @@ class HomePage extends StatelessWidget {
                       context.push('/perfil');
                     },
                   ),
+                  _DrawerItem(
+                    icon: Icons.school_outlined,
+                    label: 'Ver Tutorial',
+                    onTap: () {
+                      Navigator.pop(context);
+                      InteractiveTutorialService.resetTutorial().then((_) {
+                        _showInteractiveTutorial();
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -243,7 +329,7 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: const DashboardView(),
-      floatingActionButton: const ExpandableFab(),
+      floatingActionButton: ExpandableFab(key: _fabKey),
     );
   }
 }
@@ -286,9 +372,9 @@ class _DrawerItemState extends State<_DrawerItem> {
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           color: widget.isSelected
-              ? activeColor.withOpacity(0.1)
-              : _isHovered
-              ? activeColor.withOpacity(0.05)
+              ? activeColor.withValues(alpha: 0.1)
+              : isDark
+              ? activeColor.withValues(alpha: 0.05)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

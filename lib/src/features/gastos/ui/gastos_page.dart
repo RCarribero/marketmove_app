@@ -121,7 +121,7 @@ class _GastosPageState extends State<GastosPage> {
                       gradient: LinearGradient(
                         colors: [
                           AppColors.error,
-                          AppColors.error.withOpacity(0.7),
+                          AppColors.error.withValues(alpha: 0.7),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
@@ -293,7 +293,7 @@ class _GastosPageState extends State<GastosPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           AppColors.error,
-                          AppColors.error.withOpacity(0.7),
+                          AppColors.error.withValues(alpha: 0.7),
                         ],
                       ),
                     ),
@@ -307,7 +307,7 @@ class _GastosPageState extends State<GastosPage> {
                             height: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -319,7 +319,7 @@ class _GastosPageState extends State<GastosPage> {
                             height: 150,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -329,7 +329,7 @@ class _GastosPageState extends State<GastosPage> {
                           child: Icon(
                             Icons.receipt_long,
                             size: 80,
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                           ),
                         ),
                       ],
@@ -525,8 +525,8 @@ class _ExpenseCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isHighlighted
-                ? AppColors.error.withOpacity(0.3)
-                : Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                ? AppColors.error.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: isHighlighted ? 12 : 8,
             spreadRadius: isHighlighted ? 2 : 0,
             offset: const Offset(0, 2),
@@ -548,7 +548,7 @@ class _ExpenseCard extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: [
                         AppColors.error,
-                        AppColors.error.withOpacity(0.7),
+                        AppColors.error.withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(12),
@@ -585,7 +585,7 @@ class _ExpenseCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.secondary.withOpacity(0.1),
+                              color: AppColors.secondary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

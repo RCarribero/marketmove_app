@@ -21,6 +21,21 @@ class Profile {
     required this.createdAt,
   });
 
+  /// Crea una copia de esta instancia con los campos modificados.
+  Profile copyWith({
+    String? id,
+    String? email,
+    String? role,
+    DateTime? createdAt,
+  }) {
+    return Profile(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   /// Verifica si el usuario es administrador.
   bool get isAdmin => role == 'admin';
 

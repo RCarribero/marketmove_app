@@ -97,7 +97,7 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
                         height: 150,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -107,7 +107,7 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
                       child: Icon(
                         Icons.insights,
                         size: 60,
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                       ),
                     ),
                   ],
@@ -467,7 +467,7 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
             color: isDark ? AppColors.darkCardBackground : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: isTop3
-                ? Border.all(color: AppColors.success.withOpacity(0.3))
+                ? Border.all(color: AppColors.success.withValues(alpha: 0.3))
                 : null,
           ),
           child: Row(
@@ -477,8 +477,8 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
                 height: 36,
                 decoration: BoxDecoration(
                   color: isTop3
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.primary.withOpacity(0.1),
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -782,9 +782,11 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.1),
+              color: AppColors.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+              border: Border.all(
+                color: AppColors.warning.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [
@@ -964,7 +966,7 @@ class _AdvancedReportsPageState extends State<AdvancedReportsPage>
             decoration: BoxDecoration(
               color: isDark ? AppColors.darkCardBackground : Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withOpacity(0.3)),
+              border: Border.all(color: color.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -1246,7 +1248,7 @@ class _AlertSummaryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
