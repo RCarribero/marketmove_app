@@ -14,6 +14,15 @@ class ProductService {
     return (response as List).map((e) => Product.fromJson(e)).toList();
   }
 
+  Future<List<Product>> getAllForUser(String userId) async {
+    final response = await _client
+        .from('productos')
+        .select()
+        .eq('user_id', userId)
+        .order('createdat');
+    return (response as List).map((e) => Product.fromJson(e)).toList();
+  }
+
   Future<Product> getById(int id) async {
     final response = await _client
         .from('productos')
