@@ -71,7 +71,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       AppColors.primary,
-                      AppColors.primary.withOpacity(0.8),
+                      AppColors.primary.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -85,7 +85,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         height: 200,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                     ),
@@ -97,7 +97,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         height: 150,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                     ),
@@ -158,7 +158,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -183,7 +183,9 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                                 radius: 24,
                                 backgroundColor: isAdmin
                                     ? AppColors.primary
-                                    : AppColors.secondary.withOpacity(0.1),
+                                    : AppColors.secondary.withValues(
+                                        alpha: 0.1,
+                                      ),
                                 child: Text(
                                   initial,
                                   style: TextStyle(

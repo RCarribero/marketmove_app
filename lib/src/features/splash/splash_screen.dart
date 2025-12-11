@@ -66,7 +66,18 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateToNextScreen() {
     final authProvider = context.read<AuthProvider>();
     if (authProvider.user != null) {
-      context.go('/home');
+      // Usuario autenticado - verificar si tiene suscripcion activa
+      if (authProvider.hasActiveSubscription) {
+        // Tiene suscripcion - ir al dashboard correspondiente
+        if (authProvider.isAdmin) {
+          context.go('/home');
+        } else {
+          context.go('/user-dashboard');
+        }
+      } else {
+        // No tiene suscripcion activa - ir a pricing
+        context.go('/pricing');
+      }
     } else {
       context.go('/login');
     }
@@ -113,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -156,7 +167,7 @@ class _SplashScreenState extends State<SplashScreen>
                       'Gestion inteligente de tu negocio',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -172,7 +183,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.white.withOpacity(0.8),
+                      Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ),

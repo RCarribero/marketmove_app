@@ -276,7 +276,7 @@ class _VentasPageState extends State<VentasPage> {
                             height: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -288,7 +288,7 @@ class _VentasPageState extends State<VentasPage> {
                             height: 150,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -298,7 +298,7 @@ class _VentasPageState extends State<VentasPage> {
                           child: Icon(
                             Icons.shopping_bag,
                             size: 80,
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                           ),
                         ),
                       ],
@@ -494,8 +494,8 @@ class _SaleCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isHighlighted
-                ? AppColors.primary.withOpacity(0.3)
-                : Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                ? AppColors.primary.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: isHighlighted ? 12 : 8,
             spreadRadius: isHighlighted ? 2 : 0,
             offset: const Offset(0, 2),

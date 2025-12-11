@@ -6,7 +6,7 @@ class AuthTheme {
   static const cardPadding = EdgeInsets.all(32.0);
 
   static BoxDecoration get logoDecoration => BoxDecoration(
-    color: AppColors.primary.withOpacity(0.1),
+    color: AppColors.primary.withValues(alpha: 0.1),
     shape: BoxShape.circle,
   );
 

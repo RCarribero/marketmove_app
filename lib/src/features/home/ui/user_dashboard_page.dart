@@ -1,14 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/theme/colors.dart';
 import '../../../shared/widgets/expandable_fab.dart';
+import '../../../shared/services/interactive_tutorial_service.dart';
 import 'dashboard_view.dart';
 
-class UserDashboardPage extends StatelessWidget {
+class UserDashboardPage extends StatefulWidget {
   const UserDashboardPage({super.key});
+
+  @override
+  State<UserDashboardPage> createState() => _UserDashboardPageState();
+}
+
+class _UserDashboardPageState extends State<UserDashboardPage> {
+  // Keys para el tutorial
+  final GlobalKey _menuKey = GlobalKey();
+  final GlobalKey _themeKey = GlobalKey();
+  final GlobalKey _fabKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    // Mostrar tutorial interactivo si es la primera vez
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final hasShown = await InteractiveTutorialService.hasShownTutorial();
+      if (!hasShown && mounted) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) _showInteractiveTutorial();
+      }
+    });
+  }
+
+  void _showInteractiveTutorial() {
+    final targets = <TargetFocus>[
+      InteractiveTutorialService.createTarget(
+        key: _menuKey,
+        title: 'Menu Principal',
+        description:
+            'Abre el menu lateral para navegar entre secciones: Ventas, Gastos, Productos, Reportes y mas.',
+        align: ContentAlign.bottom,
+        shape: ShapeLightFocus.Circle,
+      ),
+      InteractiveTutorialService.createTarget(
+        key: _themeKey,
+        title: 'Cambiar Tema',
+        description: 'Cambia entre modo claro y oscuro segun tu preferencia.',
+        align: ContentAlign.bottom,
+        shape: ShapeLightFocus.Circle,
+      ),
+      InteractiveTutorialService.createTarget(
+        key: _fabKey,
+        title: 'Acciones Rapidas',
+        description:
+            'Pulsa aqui para agregar rapidamente una venta, gasto o producto nuevo.',
+        align: ContentAlign.top,
+        shape: ShapeLightFocus.Circle,
+      ),
+    ];
+
+    InteractiveTutorialService.showTutorial(context: context, targets: targets);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +74,13 @@ class UserDashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            key: _menuKey,
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text(
           'MarketMove',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
@@ -38,6 +100,7 @@ class UserDashboardPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            key: _themeKey,
             icon: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) {
@@ -93,7 +156,7 @@ class UserDashboardPage extends StatelessWidget {
                       radius: 29,
                       backgroundColor: isDark
                           ? AppColors.darkSurface
-                          : AppColors.primary.withOpacity(0.1),
+                          : AppColors.primary.withValues(alpha: 0.1),
                       child: Text(
                         userEmail[0].toUpperCase(),
                         style: TextStyle(
@@ -123,7 +186,7 @@ class UserDashboardPage extends StatelessWidget {
                         Text(
                           userEmail,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 13,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -202,6 +265,15 @@ class UserDashboardPage extends StatelessWidget {
                     },
                     isDark: isDark,
                   ),
+                  _DrawerItem(
+                    icon: Icons.auto_awesome,
+                    label: 'Asistente IA',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/chat');
+                    },
+                    isDark: isDark,
+                  ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(),
@@ -210,6 +282,17 @@ class UserDashboardPage extends StatelessWidget {
                     icon: isDark ? Icons.light_mode : Icons.dark_mode,
                     label: isDark ? 'Modo Claro' : 'Modo Oscuro',
                     onTap: () => themeProvider.toggleTheme(),
+                    isDark: isDark,
+                  ),
+                  _DrawerItem(
+                    icon: Icons.school_outlined,
+                    label: 'Ver Tutorial',
+                    onTap: () {
+                      Navigator.pop(context);
+                      InteractiveTutorialService.resetTutorial().then((_) {
+                        _showInteractiveTutorial();
+                      });
+                    },
                     isDark: isDark,
                   ),
                 ],
@@ -234,7 +317,7 @@ class UserDashboardPage extends StatelessWidget {
         ),
       ),
       body: const DashboardView(),
-      floatingActionButton: const ExpandableFab(),
+      floatingActionButton: ExpandableFab(key: _fabKey),
     );
   }
 }
@@ -280,9 +363,9 @@ class _DrawerItemState extends State<_DrawerItem> {
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
           color: widget.isSelected
-              ? activeColor.withOpacity(0.1)
+              ? activeColor.withValues(alpha: 0.1)
               : _isHovered
-              ? activeColor.withOpacity(0.05)
+              ? activeColor.withValues(alpha: 0.05)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

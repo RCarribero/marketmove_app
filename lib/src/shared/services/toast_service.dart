@@ -21,28 +21,28 @@ class ToastService {
     switch (type) {
       case ToastType.success:
         backgroundColor = isDark
-            ? AppColors.success.withOpacity(0.9)
+            ? AppColors.success.withValues(alpha: 0.9)
             : AppColors.success;
         iconColor = Colors.white;
         icon = Icons.check_circle_outline;
         break;
       case ToastType.error:
         backgroundColor = isDark
-            ? AppColors.error.withOpacity(0.9)
+            ? AppColors.error.withValues(alpha: 0.9)
             : AppColors.error;
         iconColor = Colors.white;
         icon = Icons.error_outline;
         break;
       case ToastType.warning:
         backgroundColor = isDark
-            ? AppColors.warning.withOpacity(0.9)
+            ? AppColors.warning.withValues(alpha: 0.9)
             : AppColors.warning;
         iconColor = Colors.white;
         icon = Icons.warning_amber_outlined;
         break;
       case ToastType.info:
         backgroundColor = isDark
-            ? AppColors.info.withOpacity(0.9)
+            ? AppColors.info.withValues(alpha: 0.9)
             : AppColors.info;
         iconColor = Colors.white;
         icon = Icons.info_outline;
@@ -64,7 +64,7 @@ class ToastService {
       reverseAnimationCurve: Curves.easeInCubic,
       boxShadows: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),

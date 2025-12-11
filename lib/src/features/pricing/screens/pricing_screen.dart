@@ -423,6 +423,9 @@ class _PricingScreenState extends State<PricingScreen>
   }
 
   Widget _buildAppBar(bool isDark, bool isDesktop) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
     return SliverAppBar(
       expandedHeight: 70,
       floating: true,
@@ -432,39 +435,47 @@ class _PricingScreenState extends State<PricingScreen>
       backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          padding: EdgeInsets.symmetric(horizontal: isDesktop ? 80 : 20),
+          padding: EdgeInsets.symmetric(horizontal: isDesktop ? 80 : 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Logo
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(isMobile ? 8 : 10),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [AppColors.primary, AppColors.secondary],
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.hub, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'MarketMove',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    child: Icon(
+                      Icons.hub,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
                     ),
                   ),
+                  if (!isMobile) ...[
+                    const SizedBox(width: 12),
+                    Text(
+                      'MarketMove',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
 
               // Actions
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Language selector
+                  // Language selector - solo icono en movil
                   PopupMenuButton<String>(
                     onSelected: (locale) {
                       setState(() {
@@ -480,8 +491,8 @@ class _PricingScreenState extends State<PricingScreen>
                       ),
                     ],
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 8 : 12,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
@@ -492,27 +503,75 @@ class _PricingScreenState extends State<PricingScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.language, size: 18),
-                          const SizedBox(width: 4),
-                          Text(PricingStrings.currentLocale.toUpperCase()),
+                          if (!isMobile) ...[
+                            const SizedBox(width: 4),
+                            Text(PricingStrings.currentLocale.toUpperCase()),
+                          ],
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  FilledButton.icon(
-                    onPressed: () => context.push('/login'),
-                    icon: const Icon(Icons.login, size: 18),
-                    label: Text(PricingStrings.get('login')),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                  const SizedBox(width: 8),
+                  // Actions - Login or User info
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, _) {
+                      if (auth.user != null) {
+                        // Usuario autenticado - solo boton dashboard
+                        return isMobile
+                            ? IconButton(
+                                onPressed: () => context.go(
+                                  auth.isAdmin ? '/home' : '/user-dashboard',
+                                ),
+                                icon: const Icon(Icons.dashboard),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                ),
+                              )
+                            : FilledButton.icon(
+                                onPressed: () => context.go(
+                                  auth.isAdmin ? '/home' : '/user-dashboard',
+                                ),
+                                icon: const Icon(Icons.dashboard, size: 18),
+                                label: const Text('Ir al Dashboard'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                      }
+                      // Usuario no autenticado - mostrar boton login
+                      return isMobile
+                          ? IconButton(
+                              onPressed: () => context.push('/login'),
+                              icon: const Icon(Icons.login),
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                              ),
+                            )
+                          : FilledButton.icon(
+                              onPressed: () => context.push('/login'),
+                              icon: const Icon(Icons.login, size: 18),
+                              label: Text(PricingStrings.get('login')),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                    },
                   ),
                 ],
               ),
@@ -724,25 +783,41 @@ class _PricingScreenState extends State<PricingScreen>
   }
 
   Widget _buildFAB(bool isDark) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FloatingActionButton(
-          heroTag: 'chat',
-          mini: true,
-          backgroundColor: AppColors.primary,
-          onPressed: () => setState(() => _showChat = !_showChat),
-          child: Icon(_showChat ? Icons.close : Icons.chat),
-        ),
-        const SizedBox(height: 8),
-        FloatingActionButton.extended(
-          heroTag: 'login',
-          backgroundColor: AppColors.primary,
-          onPressed: () => context.push('/login'),
-          icon: const Icon(Icons.login),
-          label: Text(PricingStrings.get('login')),
-        ),
-      ],
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              heroTag: 'chat',
+              mini: true,
+              backgroundColor: AppColors.primary,
+              onPressed: () => setState(() => _showChat = !_showChat),
+              child: Icon(_showChat ? Icons.close : Icons.chat),
+            ),
+            const SizedBox(height: 8),
+            if (auth.user != null)
+              // Usuario autenticado - mostrar boton dashboard
+              FloatingActionButton.extended(
+                heroTag: 'dashboard',
+                backgroundColor: AppColors.primary,
+                onPressed: () =>
+                    context.go(auth.isAdmin ? '/home' : '/user-dashboard'),
+                icon: const Icon(Icons.dashboard),
+                label: const Text('Dashboard'),
+              )
+            else
+              // Usuario no autenticado - mostrar boton login
+              FloatingActionButton.extended(
+                heroTag: 'login',
+                backgroundColor: AppColors.primary,
+                onPressed: () => context.push('/login'),
+                icon: const Icon(Icons.login),
+                label: Text(PricingStrings.get('login')),
+              ),
+          ],
+        );
+      },
     );
   }
 

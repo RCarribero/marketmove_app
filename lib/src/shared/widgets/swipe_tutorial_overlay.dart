@@ -98,7 +98,7 @@ class _SwipeTutorialOverlayState extends State<SwipeTutorialOverlay>
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Container(
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withValues(alpha: 0.5),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Center(
@@ -114,27 +114,29 @@ class _SwipeTutorialOverlayState extends State<SwipeTutorialOverlay>
                         end: Alignment.bottomRight,
                         colors: isDark
                             ? [
-                                Colors.grey.shade900.withOpacity(0.9),
-                                Colors.grey.shade800.withOpacity(0.9),
+                                Colors.grey.shade900.withValues(alpha: 0.9),
+                                Colors.grey.shade800.withValues(alpha: 0.9),
                               ]
                             : [
-                                Colors.white.withOpacity(0.95),
-                                Colors.grey.shade50.withOpacity(0.95),
+                                Colors.white.withValues(alpha: 0.95),
+                                Colors.grey.shade50.withValues(alpha: 0.95),
                               ],
                       ),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
+                        color: Colors.white.withValues(
+                          alpha: isDark ? 0.1 : 0.3,
+                        ),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: widget.accentColor.withOpacity(0.2),
+                          color: widget.accentColor.withValues(alpha: 0.2),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -160,7 +162,9 @@ class _SwipeTutorialOverlayState extends State<SwipeTutorialOverlay>
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: widget.accentColor.withOpacity(0.1),
+                                color: widget.accentColor.withValues(
+                                  alpha: 0.1,
+                                ),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(

@@ -560,7 +560,7 @@ class _DashboardViewState extends State<DashboardView>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -747,7 +747,7 @@ class _DashboardViewState extends State<DashboardView>
             ),
             belowBarData: BarAreaData(
               show: true,
-              color: AppColors.success.withOpacity(0.1),
+              color: AppColors.success.withValues(alpha: 0.1),
             ),
           ),
           // Expenses line
@@ -772,7 +772,7 @@ class _DashboardViewState extends State<DashboardView>
             ),
             belowBarData: BarAreaData(
               show: true,
-              color: AppColors.error.withOpacity(0.1),
+              color: AppColors.error.withValues(alpha: 0.1),
             ),
           ),
         ],
@@ -947,7 +947,7 @@ class _DashboardViewState extends State<DashboardView>
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -979,7 +979,7 @@ class _DashboardViewState extends State<DashboardView>
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: (isSale ? AppColors.success : AppColors.error)
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1072,7 +1072,7 @@ class _QuickStatCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1084,14 +1084,18 @@ class _QuickStatCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+                Icon(
+                  icon,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  size: 20,
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1130,7 +1134,7 @@ class _QuickStatCard extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -1178,10 +1182,10 @@ class _MetricCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCardBackground : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1196,7 +1200,7 @@ class _MetricCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 18),
@@ -1275,7 +1279,7 @@ class _SmallMetricCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCardBackground : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [
