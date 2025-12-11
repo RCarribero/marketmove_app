@@ -32,10 +32,14 @@ class _DashboardViewState extends State<DashboardView>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Detectar si el usuario es admin
+      final authProvider = context.read<AuthProvider>();
+      final isAdmin = authProvider.isAdmin;
+
       await Future.wait([
-        context.read<VentasProvider>().loadSales(),
-        context.read<GastosProvider>().loadExpenses(),
-        context.read<ProductsProvider>().loadProducts(),
+        context.read<VentasProvider>().loadSales(isAdmin: isAdmin),
+        context.read<GastosProvider>().loadExpenses(isAdmin: isAdmin),
+        context.read<ProductsProvider>().loadProducts(isAdmin: isAdmin),
       ]);
       if (mounted) {
         setState(() => _isLoading = false);

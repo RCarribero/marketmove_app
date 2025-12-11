@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/expense_model.dart';
 import '../services/expense_service.dart';
 
@@ -15,21 +16,26 @@ class GastosProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> loadExpenses({String? userId}) async {
+  /// Carga gastos. Si isAdmin es true, carga todos los gastos.
+  Future<void> loadExpenses({bool isAdmin = false, String? userId}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Si se pasa userId, filtramos por ese ID (Solo funcionará si es Admin por RLS)
-      // Si no, carga los propios (comportamiento default)
-      if (userId != null) {
-        final response = await _service.getAllForUser(
-          userId,
-        ); // Necesitamos agregar este método al servicio
-        _expenses = response;
-      } else {
+      if (isAdmin) {
+        // Admin: cargar todos los gastos
         _expenses = await _service.getAll();
+      } else {
+        // Usuario normal: cargar solo sus gastos
+        final currentUserId =
+            userId ?? Supabase.instance.client.auth.currentUser?.id;
+        if (currentUserId != null) {
+          _expenses = await _service.getAllForUser(currentUserId);
+        } else {
+          _expenses = [];
+          _error = 'Usuario no autenticado';
+        }
       }
     } catch (e) {
       _error = e.toString();
@@ -45,8 +51,13 @@ class GastosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newExpense = await _service.insert(expense);
-      _expenses.insert(0, newExpense); // Add to top
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('Usuario no autenticado');
+      }
+      final expenseWithUser = expense.copyWith(userId: userId);
+      final newExpense = await _service.insert(expenseWithUser);
+      _expenses.insert(0, newExpense);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -61,7 +72,12 @@ class GastosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedExpense = await _service.update(expense);
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('Usuario no autenticado');
+      }
+      final expenseWithUser = expense.copyWith(userId: userId);
+      final updatedExpense = await _service.update(expenseWithUser);
       final index = _expenses.indexWhere((e) => e.id == updatedExpense.id);
       if (index != -1) {
         _expenses[index] = updatedExpense;

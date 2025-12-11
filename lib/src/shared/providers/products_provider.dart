@@ -16,18 +16,25 @@ class ProductsProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> loadProducts() async {
+  /// Carga productos. Si isAdmin es true, carga todos los productos.
+  Future<void> loadProducts({bool isAdmin = false}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId != null) {
-        _products = await _service.getAllForUser(userId);
+      if (isAdmin) {
+        // Admin: cargar todos los productos
+        _products = await _service.getAll();
       } else {
-        _products = [];
-        _error = 'Usuario no autenticado';
+        // Usuario normal: cargar solo sus productos
+        final userId = Supabase.instance.client.auth.currentUser?.id;
+        if (userId != null) {
+          _products = await _service.getAllForUser(userId);
+        } else {
+          _products = [];
+          _error = 'Usuario no autenticado';
+        }
       }
     } catch (e) {
       _error = e.toString();
@@ -47,7 +54,6 @@ class ProductsProvider extends ChangeNotifier {
       if (userId == null) {
         throw Exception('Usuario no autenticado');
       }
-      // Asignar el user_id al producto
       final productWithUser = product.copyWith(userId: userId);
       final newProduct = await _service.insert(productWithUser);
       _products.add(newProduct);
@@ -69,7 +75,6 @@ class ProductsProvider extends ChangeNotifier {
       if (userId == null) {
         throw Exception('Usuario no autenticado');
       }
-      // Asegurar que el user_id se mantiene
       final productWithUser = product.copyWith(userId: userId);
       final updatedProduct = await _service.update(productWithUser);
       final index = _products.indexWhere((p) => p.id == updatedProduct.id);
