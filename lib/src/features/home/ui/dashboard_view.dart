@@ -1005,7 +1005,7 @@ class _DashboardViewState extends State<DashboardView>
                     ),
                   ),
                   subtitle: Text(
-                    DateFormat('dd MMM HH:mm').format(date),
+                    '#${(item['data'] as dynamic).id} - ${DateFormat('dd MMM HH:mm').format(date)}',
                     style: TextStyle(
                       fontSize: 11,
                       color: isDark

@@ -585,6 +585,25 @@ class _ExpenseCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '#${expense.id}',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppColors.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
                               color: AppColors.secondary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),

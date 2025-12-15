@@ -726,7 +726,7 @@ class _ResumenPageState extends State<ResumenPage>
                         ),
                       ),
                       Text(
-                        'Stock: ${product.stock}',
+                        '#${product.id} - Stock: ${product.stock}',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDark
