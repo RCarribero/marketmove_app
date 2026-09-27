@@ -5,12 +5,20 @@ import '../models/profile_model.dart';
 
 class EmbeddedMockData {
   static const String demoUserId = 'demo-admin-user';
+  static const String demoClientId = 'demo-client-user';
 
   static final Profile demoProfile = Profile(
     id: demoUserId,
     email: 'admin@marketmove.app',
     role: 'admin',
     createdAt: DateTime(2025, 1, 1),
+  );
+
+  static final Profile demoClientProfile = Profile(
+    id: demoClientId,
+    email: 'cliente@marketmove.app',
+    role: 'user',
+    createdAt: DateTime(2025, 2, 1),
   );
 
   static List<Product> get initialProducts {
@@ -59,31 +67,31 @@ class EmbeddedMockData {
       Product(
         id: 5,
         userId: demoUserId,
-        name: 'Molinillo de Café Manual Muelas Cónicas',
-        price: 36.00,
-        stock: 9,
-        description: 'Cuerpo de aluminio y muelas cerámicas regulables.',
+        name: 'Pack 100 Filtros Papel V60',
+        price: 8.50,
+        stock: 18,
+        description: 'Filtros cónicos de celulosa blanqueada para extracción limpia.',
         imageUrl: 'https://images.unsplash.com/photo-1589396575653-c09c794ff6a6?auto=format&fit=crop&w=400&q=80',
         createdAt: now.subtract(const Duration(days: 20)),
       ),
       Product(
         id: 6,
         userId: demoUserId,
-        name: 'Pack 3 Siropes Barista Variados',
-        price: 12.50,
-        stock: 20,
-        description: 'Vainilla Bourbon, Caramelo Salado y Avellana Tostada.',
-        imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80',
+        name: 'Botella Vidrio Borosilicato 750ml',
+        price: 15.90,
+        stock: 22,
+        description: 'Funda protectora de silicona antideslizante y tapón de bambú.',
+        imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80',
         createdAt: now.subtract(const Duration(days: 15)),
       ),
       Product(
         id: 7,
         userId: demoUserId,
-        name: 'Bolsa Tote Algodón Orgánico Eco',
+        name: 'Bolsa Tela Orgánica Reutilizable',
         price: 6.90,
         stock: 55,
         description: '100% algodón orgánico certificado 300 GSM reforzado.',
-        imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80',
+        imageUrl: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=400&q=80',
         createdAt: now.subtract(const Duration(days: 10)),
       ),
       Product(

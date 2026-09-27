@@ -711,6 +711,27 @@ class _ResumenPageState extends State<ResumenPage>
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: product.imageUrl.isNotEmpty
+                        ? Image.network(
+                            product.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              child: const Icon(Icons.inventory_2_outlined, size: 18, color: AppColors.primary),
+                            ),
+                          )
+                        : Container(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            child: const Icon(Icons.inventory_2_outlined, size: 18, color: AppColors.primary),
+                          ),
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

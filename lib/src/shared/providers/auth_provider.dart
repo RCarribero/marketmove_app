@@ -76,6 +76,10 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final isClient = !email.toLowerCase().contains('admin');
+      final activeUserId = isClient ? 'demo-client-user' : 'demo-admin-user';
+      final activeEmail = email.isNotEmpty ? email : (isClient ? 'cliente@marketmove.app' : 'admin@marketmove.app');
+
       if (_client != null) {
         try {
           final response = await _client.auth.signInWithPassword(
@@ -89,23 +93,23 @@ class AuthProvider extends ChangeNotifier {
       }
 
       _user ??= User(
-        id: 'demo-admin-user',
+        id: activeUserId,
         appMetadata: const {},
-        userMetadata: const {'name': 'Demo Admin'},
+        userMetadata: {'name': isClient ? 'Laura Gómez (Cliente)' : 'Carlos Director (Admin)'},
         aud: 'authenticated',
         createdAt: DateTime.now().toIso8601String(),
-        email: email.isNotEmpty ? email : 'admin@marketmove.app',
+        email: activeEmail,
       );
 
-      _profile = await _profileService.getCurrentProfile();
+      _profile = await _profileService.getCurrentProfile(activeEmail);
       _subscription = await SubscriptionService.getSubscription() ??
           UserSubscription(
-            odId: 'demo-admin-user',
-            planId: 'pro',
+            odId: activeUserId,
+            planId: isClient ? 'free' : 'pro',
             status: SubscriptionStatus.active,
             subscriptionStartDate: DateTime.now().subtract(const Duration(days: 15)),
             subscriptionEndDate: DateTime.now().add(const Duration(days: 350)),
-            isAnnual: true,
+            isAnnual: !isClient,
           );
     } finally {
       _isLoading = false;

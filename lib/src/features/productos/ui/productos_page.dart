@@ -586,19 +586,33 @@ class _ProductListTile extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Icono con gradiente
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.secondary, AppColors.secondaryLight],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.inventory_2,
-                  color: Colors.white,
-                  size: 24,
+              // Imagen del producto con fallback a gradiente
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                      ? Image.network(
+                          product.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [AppColors.secondary, AppColors.secondaryLight],
+                              ),
+                            ),
+                            child: const Icon(Icons.inventory_2, color: Colors.white, size: 24),
+                          ),
+                        )
+                      : Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [AppColors.secondary, AppColors.secondaryLight],
+                            ),
+                          ),
+                          child: const Icon(Icons.inventory_2, color: Colors.white, size: 24),
+                        ),
                 ),
               ),
               const SizedBox(width: 14),

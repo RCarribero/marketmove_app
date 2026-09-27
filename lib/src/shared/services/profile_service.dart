@@ -8,7 +8,8 @@ class ProfileService {
   ProfileService([this._client]);
 
   /// Obtiene el perfil del usuario actual (con fallback embebido).
-  Future<Profile?> getCurrentProfile() async {
+  Future<Profile?> getCurrentProfile([String? email]) async {
+    final clientEmail = _client?.auth.currentUser?.email ?? email;
     if (_client != null) {
       try {
         final userId = _client.auth.currentUser?.id;
@@ -23,6 +24,9 @@ class ProfileService {
       } catch (_) {
         // Fallback
       }
+    }
+    if (clientEmail != null && !clientEmail.toLowerCase().contains('admin')) {
+      return EmbeddedMockData.demoClientProfile;
     }
     return EmbeddedMockData.demoProfile;
   }
@@ -43,12 +47,7 @@ class ProfileService {
     }
     return [
       EmbeddedMockData.demoProfile,
-      Profile(
-        id: 'user-demo-2',
-        email: 'empleado@marketmove.app',
-        role: 'user',
-        createdAt: DateTime(2025, 2, 10),
-      ),
+      EmbeddedMockData.demoClientProfile,
     ];
   }
 }
