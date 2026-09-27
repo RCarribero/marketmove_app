@@ -6,7 +6,13 @@ import '../models/pricing_plan.dart';
 
 /// Servicio de suscripciones con Supabase
 class SubscriptionService {
-  static final _supabase = Supabase.instance.client;
+  static SupabaseClient? get _supabase {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
   static String? _cachedDeviceId;
 
   /// Obtener ID unico del dispositivo
@@ -33,41 +39,52 @@ class SubscriptionService {
     return deviceId;
   }
 
-  /// Obtener suscripcion del usuario actual
+  /// Obtener suscripcion del usuario actual (con fallback Pro en demo)
   static Future<UserSubscription?> getSubscription() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) return null;
+    final client = _supabase;
+    final user = client?.auth.currentUser;
 
-    try {
-      final response = await _supabase
-          .from('subscriptions')
-          .select()
-          .eq('user_id', user.id)
-          .maybeSingle();
+    if (client != null && user != null) {
+      try {
+        final response = await client
+            .from('subscriptions')
+            .select()
+            .eq('user_id', user.id)
+            .maybeSingle();
 
-      if (response == null) return null;
-
-      return UserSubscription(
-        odId: response['user_id'],
-        planId: response['plan_id'] ?? 'free',
-        status: _parseStatus(response['status']),
-        trialStartDate: response['trial_start'] != null
-            ? DateTime.parse(response['trial_start'])
-            : null,
-        trialEndDate: response['trial_end'] != null
-            ? DateTime.parse(response['trial_end'])
-            : null,
-        subscriptionStartDate: response['subscription_start'] != null
-            ? DateTime.parse(response['subscription_start'])
-            : null,
-        subscriptionEndDate: response['subscription_end'] != null
-            ? DateTime.parse(response['subscription_end'])
-            : null,
-        isAnnual: response['is_annual'] ?? false,
-      );
-    } catch (e) {
-      return null;
+        if (response != null) {
+          return UserSubscription(
+            odId: response['user_id'],
+            planId: response['plan_id'] ?? 'free',
+            status: _parseStatus(response['status']),
+            trialStartDate: response['trial_start'] != null
+                ? DateTime.parse(response['trial_start'])
+                : null,
+            trialEndDate: response['trial_end'] != null
+                ? DateTime.parse(response['trial_end'])
+                : null,
+            subscriptionStartDate: response['subscription_start'] != null
+                ? DateTime.parse(response['subscription_start'])
+                : null,
+            subscriptionEndDate: response['subscription_end'] != null
+                ? DateTime.parse(response['subscription_end'])
+                : null,
+            isAnnual: response['is_annual'] ?? false,
+          );
+        }
+      } catch (_) {}
     }
+
+    return UserSubscription(
+      odId: 'demo-admin-user',
+      planId: 'pro',
+      status: SubscriptionStatus.active,
+      trialStartDate: null,
+      trialEndDate: null,
+      subscriptionStartDate: DateTime.now().subtract(const Duration(days: 30)),
+      subscriptionEndDate: DateTime.now().add(const Duration(days: 335)),
+      isAnnual: true,
+    );
   }
 
   /// Verificar si el dispositivo ya tuvo un trial

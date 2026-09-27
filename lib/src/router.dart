@@ -56,8 +56,14 @@ CustomTransitionPage<T> _buildPage<T>(
 
 /// Verifica si el usuario tiene sesion activa para redireccionar
 String? _redirectLogic(BuildContext context, GoRouterState state) {
-  final session = Supabase.instance.client.auth.currentSession;
-  final isAuthenticated = session != null;
+  bool isAuthenticated = false;
+  try {
+    final session = Supabase.instance.client.auth.currentSession;
+    isAuthenticated = session != null;
+  } catch (_) {
+    isAuthenticated = false;
+  }
+
   final isGoingToAuth =
       state.matchedLocation == '/login' || state.matchedLocation == '/register';
 

@@ -16,12 +16,16 @@ import 'src/shared/theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: 'https://qgccgvjsmzjzeqelyutq.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2NndmpzbXpqemVxZWx5dXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1NzQ4NDIsImV4cCI6MjA4MDE1MDg0Mn0.YPEaJAYmBrirsyBJ7o7QLPhRgPti9WuLeZaG-p0IhmQ',
-  );
+  // Initialize Supabase gracefully (fallbacks to embedded demo if project is paused or offline)
+  try {
+    await Supabase.initialize(
+      url: 'https://qgccgvjsmzjzeqelyutq.supabase.co',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2NndmpzbXpqemVxZWx5dXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1NzQ4NDIsImV4cCI6MjA4MDE1MDg0Mn0.YPEaJAYmBrirsyBJ7o7QLPhRgPti9WuLeZaG-p0IhmQ',
+    );
+  } catch (e) {
+    debugPrint('Supabase offline or inactive. Running in standalone embedded demo mode: $e');
+  }
 
   runApp(const MarketMoveApp());
 }
@@ -31,7 +35,12 @@ class MarketMoveApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final supabaseClient = Supabase.instance.client;
+    SupabaseClient? supabaseClient;
+    try {
+      supabaseClient = Supabase.instance.client;
+    } catch (_) {
+      supabaseClient = null;
+    }
     final profileService = ProfileService(supabaseClient);
 
     return MultiProvider(

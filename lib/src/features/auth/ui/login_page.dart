@@ -19,6 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    _emailController.text = 'admin@marketmove.app';
+    _passwordController.text = 'demo2026';
     // Pre-fill email if coming from registration
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final uri = GoRouterState.of(context).uri;
