@@ -106,15 +106,17 @@ class GeminiChatService {
     _messages.clear();
 
     try {
-      // Cargar mensajes de Supabase
-      final response = await _supabase
-          .from('chat_messages')
-          .select()
-          .eq('conversation_id', conversationId)
-          .order('created_at');
+      // Cargar mensajes de Supabase si está disponible
+      if (_supabase != null) {
+        final response = await _supabase!
+            .from('chat_messages')
+            .select()
+            .eq('conversation_id', conversationId)
+            .order('created_at');
 
-      for (final json in response) {
-        _messages.add(ChatMessage.fromJson(json));
+        for (final json in response) {
+          _messages.add(ChatMessage.fromJson(json));
+        }
       }
 
       // Iniciar sesion de chat con historial

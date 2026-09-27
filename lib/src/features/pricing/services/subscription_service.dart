@@ -89,10 +89,12 @@ class SubscriptionService {
 
   /// Verificar si el dispositivo ya tuvo un trial
   static Future<bool> hasDeviceUsedTrial() async {
+    final client = _supabase;
+    if (client == null) return false;
     final deviceId = await getDeviceId();
 
     try {
-      final response = await _supabase
+      final response = await client
           .from('subscriptions')
           .select('id')
           .eq('device_id', deviceId)
@@ -109,8 +111,15 @@ class SubscriptionService {
     String planId = 'pro',
     int trialDays = 30,
   }) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) return null;
+    final client = _supabase;
+    final user = client?.auth.currentUser;
+    if (client == null || user == null) {
+      return UserSubscription.startTrial(
+        odId: 'demo-admin-user',
+        planId: planId,
+        trialDays: trialDays,
+      );
+    }
 
     // Verificar si el usuario ya tiene suscripcion
     final existing = await getSubscription();
@@ -123,7 +132,7 @@ class SubscriptionService {
     final trialEnd = now.add(Duration(days: trialDays));
 
     try {
-      await _supabase.from('subscriptions').insert({
+      await client.from('subscriptions').insert({
         'user_id': user.id,
         'device_id': deviceId,
         'plan_id': planId,
@@ -151,8 +160,9 @@ class SubscriptionService {
     String? stripeCustomerId,
     String? stripeSubscriptionId,
   }) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) return false;
+    final client = _supabase;
+    final user = client?.auth.currentUser;
+    if (client == null || user == null) return true;
 
     final now = DateTime.now();
     final endDate = isAnnual
@@ -160,7 +170,7 @@ class SubscriptionService {
         : now.add(const Duration(days: 30));
 
     try {
-      await _supabase.from('subscriptions').upsert({
+      await client.from('subscriptions').upsert({
         'user_id': user.id,
         'device_id': await getDeviceId(),
         'plan_id': planId,
@@ -205,12 +215,13 @@ class SubscriptionService {
     final sub = await getSubscription();
     if (sub == null) return;
 
-    final user = _supabase.auth.currentUser;
-    if (user == null) return;
+    final client = _supabase;
+    final user = client?.auth.currentUser;
+    if (client == null || user == null) return;
 
     // Si trial expiro, actualizar a expired
     if (sub.status == SubscriptionStatus.trial && !sub.isTrialActive) {
-      await _supabase
+      await client
           .from('subscriptions')
           .update({
             'status': 'expired',
@@ -223,7 +234,7 @@ class SubscriptionService {
     if (sub.status == SubscriptionStatus.active &&
         sub.subscriptionEndDate != null &&
         DateTime.now().isAfter(sub.subscriptionEndDate!)) {
-      await _supabase
+      await client
           .from('subscriptions')
           .update({
             'status': 'expired',

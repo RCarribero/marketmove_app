@@ -189,8 +189,13 @@ class _ReportsPageState extends State<ReportsPage>
   Future<void> _sendByEmail() async {
     if (_generatedFile == null) return;
 
-    final user = Supabase.instance.client.auth.currentUser;
-    final email = user?.email ?? '';
+    String email = 'admin@marketmove.app';
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user?.email != null && user!.email!.isNotEmpty) {
+        email = user.email!;
+      }
+    } catch (_) {}
 
     if (email.isEmpty) {
       ToastService.error(context, 'No se encontro email del usuario');
@@ -234,7 +239,10 @@ class _ReportsPageState extends State<ReportsPage>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final user = Supabase.instance.client.auth.currentUser;
+    User? user;
+    try {
+      user = Supabase.instance.client.auth.currentUser;
+    } catch (_) {}
 
     return Scaffold(
       body: CustomScrollView(

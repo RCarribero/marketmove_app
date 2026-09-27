@@ -16,6 +16,14 @@ class GastosProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  String get _currentUserId {
+    try {
+      return Supabase.instance.client.auth.currentUser?.id ?? 'demo-admin-user';
+    } catch (_) {
+      return 'demo-admin-user';
+    }
+  }
+
   /// Carga gastos. Si isAdmin es true, carga todos los gastos.
   Future<void> loadExpenses({bool isAdmin = false, String? userId}) async {
     _isLoading = true;
@@ -28,14 +36,8 @@ class GastosProvider extends ChangeNotifier {
         _expenses = await _service.getAll();
       } else {
         // Usuario normal: cargar solo sus gastos
-        final currentUserId =
-            userId ?? Supabase.instance.client.auth.currentUser?.id;
-        if (currentUserId != null) {
-          _expenses = await _service.getAllForUser(currentUserId);
-        } else {
-          _expenses = [];
-          _error = 'Usuario no autenticado';
-        }
+        final currentUserId = userId ?? _currentUserId;
+        _expenses = await _service.getAllForUser(currentUserId);
       }
     } catch (e) {
       _error = e.toString();
@@ -51,10 +53,7 @@ class GastosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      final userId = _currentUserId;
       final expenseWithUser = expense.copyWith(userId: userId);
       final newExpense = await _service.insert(expenseWithUser);
       _expenses.insert(0, newExpense);
@@ -72,10 +71,7 @@ class GastosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      final userId = _currentUserId;
       final expenseWithUser = expense.copyWith(userId: userId);
       final updatedExpense = await _service.update(expenseWithUser);
       final index = _expenses.indexWhere((e) => e.id == updatedExpense.id);

@@ -17,6 +17,14 @@ class ProductsProvider extends ChangeNotifier {
   String? get error => _error;
 
   /// Carga productos. Si isAdmin es true, carga todos los productos.
+  String get _currentUserId {
+    try {
+      return Supabase.instance.client.auth.currentUser?.id ?? 'demo-admin-user';
+    } catch (_) {
+      return 'demo-admin-user';
+    }
+  }
+
   Future<void> loadProducts({bool isAdmin = false}) async {
     _isLoading = true;
     _error = null;
@@ -28,13 +36,8 @@ class ProductsProvider extends ChangeNotifier {
         _products = await _service.getAll();
       } else {
         // Usuario normal: cargar solo sus productos
-        final userId = Supabase.instance.client.auth.currentUser?.id;
-        if (userId != null) {
-          _products = await _service.getAllForUser(userId);
-        } else {
-          _products = [];
-          _error = 'Usuario no autenticado';
-        }
+        final userId = _currentUserId;
+        _products = await _service.getAllForUser(userId);
       }
     } catch (e) {
       _error = e.toString();
@@ -50,10 +53,7 @@ class ProductsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      final userId = _currentUserId;
       final productWithUser = product.copyWith(userId: userId);
       final newProduct = await _service.insert(productWithUser);
       _products.add(newProduct);
@@ -71,10 +71,7 @@ class ProductsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      final userId = _currentUserId;
       final productWithUser = product.copyWith(userId: userId);
       final updatedProduct = await _service.update(productWithUser);
       final index = _products.indexWhere((p) => p.id == updatedProduct.id);

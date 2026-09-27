@@ -14,13 +14,18 @@ class AdminUsersPage extends StatefulWidget {
 }
 
 class _AdminUsersPageState extends State<AdminUsersPage> {
-  final _profileService = ProfileService(Supabase.instance.client);
+  late final ProfileService _profileService;
   List<Profile> _profiles = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    SupabaseClient? client;
+    try {
+      client = Supabase.instance.client;
+    } catch (_) {}
+    _profileService = ProfileService(client);
     _loadProfiles();
   }
 
