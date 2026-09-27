@@ -67,10 +67,8 @@ String? _redirectLogic(BuildContext context, GoRouterState state) {
   final isGoingToAuth =
       state.matchedLocation == '/login' || state.matchedLocation == '/register';
 
-  // En web: si el usuario esta autenticado y va a pricing o login, redirigir a home
-  if (kIsWeb &&
-      isAuthenticated &&
-      (isGoingToAuth || state.matchedLocation == '/')) {
+  // En web: si el usuario esta autenticado y va a login/register, redirigir a home
+  if (kIsWeb && isAuthenticated && isGoingToAuth) {
     return '/home';
   }
 
@@ -85,8 +83,7 @@ final router = GoRouter(
       path: '/',
       pageBuilder: (context, state) => _buildPage(
         state,
-        // En web muestra pricing, en movil muestra splash
-        kIsWeb ? const PricingScreen() : const SplashScreen(),
+        const SplashScreen(),
         type: PageTransitionType.fade,
         durationMs: 500,
       ),
