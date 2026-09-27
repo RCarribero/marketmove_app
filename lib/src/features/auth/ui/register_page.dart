@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/theme/colors.dart';
+import '../../../shared/widgets/marketmove_logo.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -143,26 +144,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Logo
-                  Hero(
+                  const Hero(
                     tag: 'app_logo',
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.shopping_bag_outlined,
-                        size: 64,
-                        color: AppColors.primary,
-                      ),
+                    child: MarketMoveLogo(
+                      size: 112,
+                      borderRadius: 28,
                     ),
                   ),
                   const SizedBox(height: 32),

@@ -1,38 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MarketMove — Gestión inteligente de tu negocio: inventario, ventas, gastos y analítica.">
+  <meta name="theme-color" content="#3F51B5">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="marketmove_app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MarketMove">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png?v=2">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Favicon (cache-busted) -->
+  <link rel="icon" type="image/png" href="favicon.png?v=2"/>
 
-  <title>marketmove_app</title>
+  <title>MarketMove | Gestión Inteligente de tu Negocio</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3F51B5 0%, #303F9F 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Hide default Flutter Web bootstrap loader completely */
+    .flutter-loader, flt-glass-pane::before {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    #mm-initial-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #3F51B5 0%, #283593 55%, #0288D1 100%);
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s;
+    }
+
+    #mm-initial-splash.mm-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .mm-logo-card {
+      width: 124px;
+      height: 124px;
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 12px;
+      box-sizing: border-box;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28), 0 0 35px rgba(3, 169, 244, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: mmLogoPop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                 mmLogoFloat 3.2s ease-in-out 0.9s infinite;
+    }
+
+    .mm-logo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+
+    .mm-title {
+      margin-top: 32px;
+      font-size: 34px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.8px;
+      opacity: 0;
+      animation: mmFadeUp 0.65s ease-out 0.25s forwards;
+    }
+
+    .mm-subtitle {
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 0.4px;
+      opacity: 0;
+      animation: mmFadeUp 0.65s ease-out 0.4s forwards;
+    }
+
+    .mm-spinner {
+      margin-top: 48px;
+      width: 26px;
+      height: 26px;
+      border: 2.5px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: mmFadeUp 0.5s ease-out 0.5s forwards, mmSpin 0.85s linear infinite;
+    }
+
+    @keyframes mmLogoPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-18deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes mmLogoFloat {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+      }
+      50% {
+        transform: translateY(-8px) scale(1.03);
+      }
+    }
+
+    @keyframes mmFadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes mmSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Custom Branded MarketMove Initial Splash (replaces default Flutter logo) -->
+  <div id="mm-initial-splash">
+    <div class="mm-logo-card">
+      <img src="images/logo.png?v=2" alt="MarketMove Logo" />
+    </div>
+    <div class="mm-title">MarketMove</div>
+    <div class="mm-subtitle">Gestión inteligente de tu negocio</div>
+    <div class="mm-spinner"></div>
+  </div>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('mm-initial-splash');
+      if (splash) {
+        splash.classList.add('mm-hidden');
+        setTimeout(function () {
+          if (splash && splash.parentNode) {
+            splash.parentNode.removeChild(splash);
+          }
+        }, 500);
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

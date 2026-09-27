@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../shared/theme/colors.dart';
+import '../../shared/widgets/marketmove_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -116,24 +117,11 @@ class _SplashScreenState extends State<SplashScreen>
                     scale: _logoScaleAnimation.value,
                     child: Transform.rotate(
                       angle: _logoRotateAnimation.value,
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.trending_up,
-                          size: 60,
-                          color: AppColors.primary,
+                      child: const Hero(
+                        tag: 'app_logo',
+                        child: MarketMoveLogo(
+                          size: 124,
+                          borderRadius: 30,
                         ),
                       ),
                     ),

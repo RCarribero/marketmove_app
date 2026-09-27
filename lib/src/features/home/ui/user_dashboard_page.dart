@@ -6,6 +6,7 @@ import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/theme/colors.dart';
 import '../../../shared/widgets/expandable_fab.dart';
+import '../../../shared/widgets/marketmove_logo.dart';
 import '../../../shared/services/interactive_tutorial_service.dart';
 import 'dashboard_view.dart';
 
@@ -81,9 +82,16 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: const Text(
-          'MarketMove',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MarketMoveLogo(size: 32, borderRadius: 8, showShadow: false),
+            SizedBox(width: 10),
+            Text(
+              'MarketMove',
+              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
+          ],
         ),
         centerTitle: true,
         elevation: 0,
